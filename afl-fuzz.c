@@ -2739,11 +2739,12 @@ static void perform_dry_run(char** argv) {
 
         break;
 
+      
       case FAULT_TMOUT:
 
         if (timeout_given) {
 
-          /* The -t nn+ syntax in the command line sets timeout_given to '2' and
+           /*The -t nn+ syntax in the command line sets timeout_given to '2' and
              instructs afl-fuzz to tolerate but skip queue entries that time
              out. */
 
@@ -2753,6 +2754,7 @@ static void perform_dry_run(char** argv) {
             cal_failures++;
             break;
           }
+          
 
           SAYF("\n" cLRD "[-] " cRST
                "The program took more than %u ms to process one of the initial test cases.\n"
@@ -2777,7 +2779,7 @@ static void perform_dry_run(char** argv) {
           FATAL("Test case '%s' results in a timeout", fn);
 
         }
-
+      
       case FAULT_CRASH:  
 
         if (crash_mode) break;
@@ -2825,7 +2827,6 @@ static void perform_dry_run(char** argv) {
                "    - Least likely, there is a horrible bug in the fuzzer. If other options\n"
                "      fail, poke <lcamtuf@coredump.cx> for troubleshooting tips.\n",
                DMS(mem_limit << 20), mem_limit - 1, doc_path);
-
         } else {
 
           SAYF("\n" cLRD "[-] " cRST
@@ -7705,6 +7706,9 @@ static void save_cmdline(u32 argc, char** argv) {
 
 int main(int argc, char** argv) {
 
+  time_t t_start;
+  time_t t_end = 8;
+
   s32 opt;
   u64 prev_queued = 0;
   u32 sync_interval_cnt = 0, seek_to;
@@ -7999,6 +8003,8 @@ int main(int argc, char** argv) {
     if (stop_soon) goto stop_fuzzing;
   }
 
+  t_start = time(NULL);
+
   while (1) {
 
     u8 skipped_fuzz;
@@ -8056,6 +8062,8 @@ int main(int argc, char** argv) {
 
     queue_cur = queue_cur->next;
     current_entry++;
+
+    //if (t_start >= t_end) exit(0);
 
   }
 
