@@ -2465,9 +2465,10 @@ static u8 run_target(char** argv, u32 timeout) {
    is unlinked and a new one is created. Otherwise, out_fd is rewound and
    truncated. */
 
+/*
 static void write_to_testcase(void* mem, u32 len) {
   
-  s32 fd;
+  s32 fd = out_fd;
 
   time_t cur_t = time(0);
   struct tm* t = localtime(&cur_t);
@@ -2478,7 +2479,7 @@ static void write_to_testcase(void* mem, u32 len) {
   
   u8* fn = alloc_printf("%s/inputs/.input_%06u", out_dir, nfn);
   
-  unlink(fn); /* Ignore errors */
+  unlink(fn); // Ignore errors
   
   fd = open(fn, O_RDWR | O_CREAT | O_EXCL, 0600);
   
@@ -2492,6 +2493,39 @@ static void write_to_testcase(void* mem, u32 len) {
   
   ck_free(fn);
 }
+*/
+
+static void write_to_testcase(void* mem, u32 len) {
+
+  s32 fd = out_fd;
+
+  if (out_file) {
+    unlink(out_file); /* Ignore errors. */
+    fd = open(out_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (fd < 0) PFATAL("Unable to create '%s'", out_file);
+  } 
+  else lseek(fd, 0, SEEK_SET);
+
+  time_t cur_t = time(0);
+  struct tm* t = localtime(&cur_t);
+  u8* inp_n = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+  u8* inp_p = alloc_printf("%s/inputs/.input_%06u", out_dir, inp_n);
+  s32 inp = open(inp_p, O_RDWR | O_CREAT | O_EXCL, 0600); // Stefan 
+  lseek(inp, 0, SEEK_SET);
+  ck_write(inp, mem, len, out_file);
+  
+  ck_write(fd, mem, len, out_file);
+  
+  if (!out_file) {
+    if (ftruncate(fd, len)) PFATAL("ftruncate() failed"); lseek(fd, 0, SEEK_SET);
+  } 
+  else {
+    close(fd);
+    close(inp);
+  }  
+
+}
+
 
 
 /* The same, but with an adjustable gap. Used for trimming. */
@@ -7710,7 +7744,7 @@ static void save_cmdline(u32 argc, char** argv) {
 int main(int argc, char** argv) {
 
   time_t t_start;
-  time_t t_end = 86400;
+  time_t t_end;
 
   s32 opt;
   u64 prev_queued = 0;
@@ -8005,8 +8039,8 @@ int main(int argc, char** argv) {
     start_time += 4000;
     if (stop_soon) goto stop_fuzzing;
   }
-
-  t_start = time(NULL);
+  
+  t_end = time(NULL)+5;
 
   while (1) {
 
@@ -8066,6 +8100,7 @@ int main(int argc, char** argv) {
     queue_cur = queue_cur->next;
     current_entry++;
 
+    t_start = time(NULL);
     if (t_start >= t_end) exit(0);
 
   }
