@@ -2461,9 +2461,7 @@ static u8 run_target(char** argv, u32 timeout) {
 }
 
 
-/* Write modified data to file for testing. If out_file is set, the old file
-   is unlinked and a new one is created. Otherwise, out_fd is rewound and
-   truncated. */
+
 
 /*
 static void write_to_testcase(void* mem, u32 len) {
@@ -2495,35 +2493,55 @@ static void write_to_testcase(void* mem, u32 len) {
 }
 */
 
+/* Write modified data to file for testing. If out_file is set, the old file
+   is unlinked and a new one is created. Otherwise, out_fd is rewound and
+   truncated. */
+
 static void write_to_testcase(void* mem, u32 len) {
-
-  s32 fd = out_fd;
-
-  if (out_file) {
-    unlink(out_file); /* Ignore errors. */
-    fd = open(out_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd < 0) PFATAL("Unable to create '%s'", out_file);
-  } 
-  else lseek(fd, 0, SEEK_SET);
 
   time_t cur_t = time(0);
   struct tm* t = localtime(&cur_t);
-  u8* inp_n = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
-  u8* inp_p = alloc_printf("%s/inputs/.input_%06u", out_dir, inp_n);
-  s32 inp = open(inp_p, O_RDWR | O_CREAT | O_EXCL, 0600); // Stefan 
-  lseek(inp, 0, SEEK_SET);
-  ck_write(inp, mem, len, out_file);
-  
+  u8* nfn = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u",t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,t->tm_hour, t->tm_min, t->tm_sec);
+  u8* fn = alloc_printf("%s/inputs/input:%06u", out_dir, nfn);
+
+  s32 id = open(fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
+  s32 fd = out_fd;
+
+  // If out_file is set, the old file is unlinked and a new one is created. 
+  if (out_file) {
+    unlink(out_file); 
+    fd = open(out_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (fd < 0) {
+      PFATAL("Unable to create '%s'", out_file);
+    }
+  } 
+
+  // Otherwise, out_fd is rewound and truncated. 
+  else {
+    lseek(fd, 0, SEEK_SET);
+  }
   ck_write(fd, mem, len, out_file);
-  
+  ck_write(id, mem, len, fn);
+
   if (!out_file) {
-    if (ftruncate(fd, len)) PFATAL("ftruncate() failed"); lseek(fd, 0, SEEK_SET);
+    if (ftruncate(fd, len)) {
+      PFATAL("ftruncate() failed");
+    }
+    lseek(fd, 0, SEEK_SET);
   } 
   else {
     close(fd);
-    close(inp);
-  }  
+    close(id);
+  }
 
+
+
+
+
+  u8* in = alloc_printf("%s/inputs/INPUT", out_dir);    // change
+  s32 id = open(in, O_RDWR | O_CREAT | O_EXCL, 0600);
+  if (id < 0) PFATAL("Unable to create '%s'", fn);
+  ck_free(in);
 }
 
 
