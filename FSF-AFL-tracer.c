@@ -3580,17 +3580,17 @@ static void maybe_delete_out_dir(void) {
 
     rename(orig_q, in_dir); /* Ignore errors */
 
-    OKF("Output directory exists, will attempt session resume.");
+    //OKF("Output directory exists, will attempt session resume.");
 
     ck_free(orig_q);
 
   } else {
 
-    OKF("Output directory exists but deemed OK to reuse.");
+    //OKF("Output directory exists but deemed OK to reuse.");
 
   }
 
-  ACTF("Deleting old session data...");
+  //ACTF("Deleting old session data...");
 
   /* Okay, let's get the ball rolling! First, we need to get rid of the entries
      in <out_dir>/.synced/.../id:*, if any are present. */
@@ -3725,7 +3725,7 @@ static void maybe_delete_out_dir(void) {
   if (unlink(fn) && errno != ENOENT) goto dir_cleanup_failed;
   ck_free(fn);
 
-  OKF("Output dir cleanup successful.");
+  //OKF("Output dir cleanup successful.");
 
   /* Wow... is that all? If yes, celebrate! */
 
