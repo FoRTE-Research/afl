@@ -8063,7 +8063,7 @@ int main(int argc, char** argv) {
     queue_cur = queue_cur->next;
     current_entry++;
 
-    if (t_start >= t_end) exit(0);
+    //if (t_start >= t_end) exit(0);
 
   }
 

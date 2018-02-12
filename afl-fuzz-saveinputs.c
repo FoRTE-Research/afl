@@ -2499,49 +2499,38 @@ static void write_to_testcase(void* mem, u32 len) {
 
 static void write_to_testcase(void* mem, u32 len) {
 
-  time_t cur_t = time(0);
-  struct tm* t = localtime(&cur_t);
-  u8* nfn = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u",t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,t->tm_hour, t->tm_min, t->tm_sec);
-  u8* fn = alloc_printf("%s/inputs/input:%06u", out_dir, nfn);
+  if (get_cur_time() - start_time > 20*1000){
+    exit(0);
+  }
 
-  s32 id = open(fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
+  u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
+  s32 id_mem = open(in_mem, O_RDWR | O_CREAT | O_APPEND, 0600);
+
+  u8* in_len  = alloc_printf("%s/_ins-sizes", out_dir);
+  FILE *out = fopen(in_len, "a"); 
+  
+  fprintf(out, "%u\n", len);  
+  fclose(out);  
+
+  write(id_mem, mem, len);
+  close(id_mem);  
+
+
   s32 fd = out_fd;
 
-  // If out_file is set, the old file is unlinked and a new one is created. 
   if (out_file) {
-    unlink(out_file); 
+    unlink(out_file); /* Ignore errors. */
     fd = open(out_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd < 0) {
-      PFATAL("Unable to create '%s'", out_file);
-    }
-  } 
+    if (fd < 0) PFATAL("Unable to create '%s'", out_file);
+  } else lseek(fd, 0, SEEK_SET);
 
-  // Otherwise, out_fd is rewound and truncated. 
-  else {
-    lseek(fd, 0, SEEK_SET);
-  }
   ck_write(fd, mem, len, out_file);
-  ck_write(id, mem, len, fn);
 
   if (!out_file) {
-    if (ftruncate(fd, len)) {
-      PFATAL("ftruncate() failed");
-    }
+    if (ftruncate(fd, len)) PFATAL("ftruncate() failed");
     lseek(fd, 0, SEEK_SET);
-  } 
-  else {
-    close(fd);
-    close(id);
-  }
+  } else close(fd);
 
-
-
-
-
-  u8* in = alloc_printf("%s/inputs/INPUT", out_dir);    // change
-  s32 id = open(in, O_RDWR | O_CREAT | O_EXCL, 0600);
-  if (id < 0) PFATAL("Unable to create '%s'", fn);
-  ck_free(in);
 }
 
 
@@ -7761,8 +7750,10 @@ static void save_cmdline(u32 argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-  time_t t_start;
-  time_t t_end;
+  u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
+  remove(in_mem);
+  u8* in_len  = alloc_printf("%s/_ins-sizes", out_dir);
+  remove(in_len);
 
   s32 opt;
   u64 prev_queued = 0;
@@ -8058,8 +8049,6 @@ int main(int argc, char** argv) {
     if (stop_soon) goto stop_fuzzing;
   }
   
-  t_end = time(NULL)+5;
-
   while (1) {
 
     u8 skipped_fuzz;
@@ -8117,9 +8106,6 @@ int main(int argc, char** argv) {
 
     queue_cur = queue_cur->next;
     current_entry++;
-
-    t_start = time(NULL);
-    if (t_start >= t_end) exit(0);
 
   }
 
