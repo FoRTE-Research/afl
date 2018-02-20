@@ -129,9 +129,7 @@ static void classify_counts(u8* mem, const u8* map) {
 /* Get rid of shared memory (atexit handler). */
 
 static void remove_shm(void) {
-
   shmctl(shm_id, IPC_RMID, NULL);
-
 }
 
 
@@ -153,9 +151,9 @@ static void setup_shm(void) {
 
   ck_free(shm_str);
 
-  trace_bits = shmat(shm_id, NULL, 0);
+  //trace_bits = shmat(shm_id, NULL, 0);
   
-  if (!trace_bits) PFATAL("shmat() failed");
+  //if (!trace_bits) PFATAL("shmat() failed");
 
 }
 
@@ -262,7 +260,7 @@ static void run_target(char** argv) {
       s32 fd = open("/dev/null", O_RDWR);
 
       if (fd < 0 || dup2(fd, 1) < 0 || dup2(fd, 2) < 0) {
-        *(u32*)trace_bits = EXEC_FAIL_SIG;
+        //*(u32*)trace_bits = EXEC_FAIL_SIG;
         PFATAL("Descriptor initialization failed");
       }
 
@@ -297,7 +295,7 @@ static void run_target(char** argv) {
 
     execv(target_path, argv);
 
-    *(u32*)trace_bits = EXEC_FAIL_SIG;
+    //*(u32*)trace_bits = EXEC_FAIL_SIG;
     exit(0);
 
   }
@@ -325,11 +323,11 @@ static void run_target(char** argv) {
 
   /* Clean up bitmap, analyze exit condition, etc. */
 
-  if (*(u32*)trace_bits == EXEC_FAIL_SIG)
-    FATAL("Unable to execute '%s'", argv[0]);
+  /*if (*(u32*)trace_bits == EXEC_FAIL_SIG)
+    FATAL("Unable to execute '%s'", argv[0]);*/
 
-  classify_counts(trace_bits, binary_mode ?
-                  count_class_binary : count_class_human);
+  /*classify_counts(trace_bits, binary_mode ?
+                  count_class_binary : count_class_human);*/
 
   if (!quiet_mode)
     SAYF(cRST "-- Program output ends --\n");
@@ -746,9 +744,10 @@ int main(int argc, char** argv) {
   if (optind == argc || !out_file) usage(argv[0]);
 
   setup_shm();
-  setup_signal_handlers();
 
-  set_up_environment();
+  //setup_signal_handlers();
+
+  //set_up_environment();
 
   find_binary(argv[optind]);
 
@@ -759,21 +758,24 @@ int main(int argc, char** argv) {
 
   detect_file_args(argv + optind);
 
-  if (qemu_mode)
+  if (qemu_mode){
     use_argv = get_qemu_argv(argv[0], argv + optind, argc - optind);
-  else
+  }
+  else{
     use_argv = argv + optind;
+  }
 
   run_target(use_argv);
 
-  tcnt = write_results();
+  //tcnt = write_results();
 
-  if (!quiet_mode) {
+  /*if (!quiet_mode) {
 
     if (!tcnt) FATAL("No instrumentation detected" cRST);
     OKF("Captured %u tuples in '%s'." cRST, tcnt, out_file);
 
   }
+  */
 
   exit(child_crashed * 2 + child_timed_out);
 

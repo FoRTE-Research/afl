@@ -1040,7 +1040,7 @@ static u32 count_non_255_bytes(u8* mem) {
    is hit or not. Called on every new crash or timeout, should be
    reasonably fast. */
 
-static const u8 simplify_lookup[256] = { 
+static const u8 simplify_lookup[256] = {
 
   [0]         = 1,
   [1 ... 255] = 128
@@ -2277,7 +2277,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
   /* If we're running in "dumb" mode, we can't rely on the fork server
      logic compiled into the target program, so we will just keep calling
-     execve(). There is a bit of code duplication between here and 
+     execve(). There is a bit of code duplication between here and
      init_forkserver(), but c'est la vie. */
 
   if (dumb_mode == 1 || no_forkserver) {
@@ -3130,7 +3130,7 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
     if (!(hnb = has_new_bits(virgin_bits))) {
       if (crash_mode) total_crashes++;
       return 0;
-    }    
+    }
 
 #ifndef SIMPLE_FILES
 
@@ -5135,7 +5135,7 @@ static u8 fuzz_one(char** argv) {
 
        We do this here, rather than as a separate stage, because it's a nice
        way to keep the operation approximately "free" (i.e., no extra execs).
-       
+
        Empirically, performing the check when flipping the least significant bit
        is advantageous, compared to doing it at the time of more disruptive
        changes, where the program flow may be affected in more violent ways.
@@ -5181,7 +5181,7 @@ static u8 fuzz_one(char** argv) {
 
       if (cksum != queue_cur->exec_cksum) {
 
-        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];        
+        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];
         a_len++;
 
       }
@@ -5522,11 +5522,11 @@ skip_bitflip:
           r4 = orig ^ SWAP16(SWAP16(orig) - j);
 
       /* Try little endian addition and subtraction first. Do it only
-         if the operation would affect more than one byte (hence the 
+         if the operation would affect more than one byte (hence the
          & 0xff overflow checks) and if it couldn't be a product of
          a bitflip. */
 
-      stage_val_type = STAGE_VAL_LE; 
+      stage_val_type = STAGE_VAL_LE;
 
       if ((orig & 0xff) + j > 0xff && !could_be_bitflip(r1)) {
 
@@ -5535,7 +5535,7 @@ skip_bitflip:
 
         if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
         stage_cur++;
- 
+
       } else stage_max--;
 
       if ((orig & 0xff) < j && !could_be_bitflip(r2)) {
@@ -5954,7 +5954,7 @@ skip_interest:
     for (j = 0; j < extras_cnt; j++) {
 
       if (len + extras[j].len > MAX_FILE) {
-        stage_max--; 
+        stage_max--;
         continue;
       }
 
@@ -6091,7 +6091,7 @@ havoc_stage:
     u32 use_stacking = 1 << (1 + UR(HAVOC_STACK_POW2));
 
     stage_cur_val = use_stacking;
- 
+
     for (i = 0; i < use_stacking; i++) {
 
       switch (UR(15 + ((extras_cnt + a_extras_cnt) ? 2 : 0))) {
@@ -6103,7 +6103,7 @@ havoc_stage:
           FLIP_BIT(out_buf, UR(temp_len << 3));
           break;
 
-        case 1: 
+        case 1:
 
           /* Set byte to interesting value. */
 
@@ -6137,7 +6137,7 @@ havoc_stage:
           if (temp_len < 4) break;
 
           if (UR(2)) {
-  
+
             *(u32*)(out_buf + UR(temp_len - 3)) =
               interesting_32[UR(sizeof(interesting_32) >> 2)];
 
@@ -7504,7 +7504,7 @@ static void check_asan_opts(void) {
 
   }
 
-} 
+}
 
 
 /* Detect @@ in args. */

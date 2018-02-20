@@ -2472,17 +2472,26 @@ static u8 run_target(char** argv, u32 timeout) {
 /* stefan */
 
 static void write_to_testcase(void* mem, u32 len) {
-  
+
+  if (get_cur_time()-start_time > 10*1000) exit(0);
+
+  u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
+  s32 id_mem = open(in_mem, O_RDWR | O_CREAT | O_APPEND, 0600);
+  u8* in_len  = alloc_printf("%s/_ins-sizes", out_dir);
+  FILE *id_len = fopen(in_len, "a"); 
+  fprintf(id_len, "%u\n", len);  
+  fclose(id_len);  
+  write(id_mem, mem, len);
+  close(id_mem);  
+
   s32 fd;
 
   time_t cur_t = time(0);
   struct tm* t = localtime(&cur_t);
-
   u8* nfn = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u",
                            t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-                           t->tm_hour, t->tm_min, t->tm_sec);
-  
-  u8* fn = alloc_printf("%s/.input_%06u", FSF_ins_dir, nfn);
+                           t->tm_hour, t->tm_min, t->tm_sec);  
+  u8* fn = alloc_printf("%s/input_%06u", FSF_ins_dir, nfn);
   
   unlink(fn); /* Ignore errors */
   
@@ -2497,6 +2506,7 @@ static void write_to_testcase(void* mem, u32 len) {
   close(fd);
   
   ck_free(fn);
+
 }
 
 
@@ -5043,6 +5053,7 @@ static u8 fuzz_one(char** argv) {
    * TRIMMING *
    ************/
 
+
   if (!dumb_mode && !queue_cur->trim_done) {
 
     u8 res = trim_case(argv, queue_cur, in_buf);
@@ -5055,7 +5066,7 @@ static u8 fuzz_one(char** argv) {
       goto abandon_entry;
     }
 
-    /* Don't retry trimming, even if it failed. */
+    // Don't retry trimming, even if it failed. 
 
     queue_cur->trim_done = 1;
 
@@ -5064,6 +5075,8 @@ static u8 fuzz_one(char** argv) {
   }
 
   memcpy(out_buf, in_buf, len);
+
+  
 
   /*********************
    * PERFORMANCE SCORE *
@@ -7706,9 +7719,6 @@ static void save_cmdline(u32 argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-  time_t t_start;
-  time_t t_end = 10; //172800
-
   s32 opt;
   u64 prev_queued = 0;
   u32 sync_interval_cnt = 0, seek_to;
@@ -7724,7 +7734,7 @@ int main(int argc, char** argv) {
 
   SAYF(cCYA "FullSpeedFuzzing AFL input generation " cBRI cRST "\n");
 
-  ACTF("Generating inputs for %i seconds...", t_end);
+  ACTF("Generating inputs for 10 seconds...");
 
   doc_path = access(DOC_PATH, F_OK) ? "docs" : DOC_PATH;
 
@@ -7732,7 +7742,7 @@ int main(int argc, char** argv) {
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
 
-  while ((opt = getopt(argc, argv, "+o:f:m:t:T:dnCB:S:M:x:Q")) > 0)
+  while ((opt = getopt(argc, argv, "+f:m:t:T:dnCB:S:M:x:Q")) > 0)
 
     switch (opt) {
 
@@ -7906,19 +7916,20 @@ int main(int argc, char** argv) {
 
     }
 
+  if (qemu_mode)
+    use_argv = get_qemu_argv(argv[0], argv + optind, argc - optind);
+  else
+    use_argv = argv + optind;
+
   char resolved_path[PATH_MAX]; 
   char * bname = basename(argv[argc-1]);
   char * dname = realpath(argv[argc-1], resolved_path);
+
   int x = strlen(dname) - strlen(bname) - 1;
   dname[x] = 0;
   FSF_ins_dir = alloc_printf("%s/FullSpeedFuzzing_%s/inputs", dname, bname);
   in_dir = alloc_printf("%s/FullSpeedFuzzing_%s/seeds", dname, bname);
   out_dir = alloc_printf("%s/FullSpeedFuzzing_%s/out_AFL", dname, bname);
-
-  /*
-  in_dir = "FullSpeedFuzzing/seeds";
-  out_dir = "FullSpeedFuzzing/out_AFL";
-  */
 
   if (optind == argc || !in_dir || !out_dir) usage(argv[0]);
 
@@ -8003,11 +8014,11 @@ int main(int argc, char** argv) {
 
   perform_dry_run(use_argv);
 
-  /*cull_queue();*/
+  cull_queue();
 
   /*show_init_stats();*/
 
-  /*seek_to = find_start_position();*/
+  seek_to = find_start_position();
 
   /*write_stats_file(0, 0, 0);*/
   save_auto();
@@ -8022,13 +8033,11 @@ int main(int argc, char** argv) {
     if (stop_soon) goto stop_fuzzing;
   }
 
-  t_start = time(NULL);
-
   while (1) {
 
     u8 skipped_fuzz;
 
-    /*cull_queue();*/
+    cull_queue();
 
     if (!queue_cur) {
 
@@ -8082,7 +8091,6 @@ int main(int argc, char** argv) {
     queue_cur = queue_cur->next;
     current_entry++;
 
-    if (t_start >= t_end) exit(0);
   }
 
 
