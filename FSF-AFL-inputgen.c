@@ -2473,7 +2473,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
 static void write_to_testcase(void* mem, u32 len) {
 
-  if (get_cur_time()-start_time > 10*1000) exit(0);
+  if (get_cur_time()-start_time > 24*60*60*1000) exit(0);
 
   u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
   s32 id_mem = open(in_mem, O_RDWR | O_CREAT | O_APPEND, 0600);
