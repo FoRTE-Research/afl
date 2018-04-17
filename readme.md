@@ -36,7 +36,7 @@ First, verify that you have configured the environment variables described above
 
 Next, instrument the target binary:
 ```
-afl-dyninst -i djpeg -o djpeg.inst -v
+afl-dyninst -i [path/to/target] -o [path/to/dyninst/instrumented/target] -v
 ```
 
 Then, run as follows:
