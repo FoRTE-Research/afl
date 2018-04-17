@@ -46,7 +46,7 @@ testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile
 
 ### QEMU Mode
 Skip pre-instrumenting the target and run with the `-Q` argument:
-``
+```
 testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -Q -- [path/to/target] [args]
 ```
 
