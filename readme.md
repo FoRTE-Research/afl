@@ -57,7 +57,7 @@ testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile
 NOTE: you made need to disable AFL's check for CPU frequency scaling
 
 ```
-export AFL_SKIP_BIN_CHECK=1
+export AFL_SKIP_CPUFREQ=1
 ```
 
 ### QEMU Mode
