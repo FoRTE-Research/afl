@@ -61,7 +61,13 @@ export AFL_SKIP_CPUFREQ=1
 ```
 
 ### QEMU Mode
-Skip pre-instrumenting the target and run with the `-Q` argument:
+First, make sure you've installed QEMU and AFL's QEMU patches:
+```
+cd qemu_mode
+sudo ./build_qemu_support.sh
+```
+
+To run AFL with QEMU tracing, just skip pre-instrumenting the target and run with the `-Q` argument:
 ```
 testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -Q -- [path/to/target] [args]
 ```
