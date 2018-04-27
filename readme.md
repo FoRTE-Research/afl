@@ -8,28 +8,39 @@ This repository contains several modified versions of AFL.
 ```
 git clone https://github.com/FoRTE-Research/afl
 cd afl
-sudo make all && sudo make install
+make all
 ```
+
+Add `/path/to/afl` to your system's `PATH` variable. 
 
 ### 2. Installing Dyninst
 See here: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
 
 ### 3. Installing AFL-Dyninst
+
 ```
 git clone https://github.com/FoRTE-Research/afl-dyninst
 cd afl-dyninst
-sudo make all && sudo make install
 ```
+
+Update `DYN_ROOT` in `Makefile` to where you installed Dyninst.
+
+```
+make all
+```
+
+Add `/path/to/afl-dyninst` to your system's `PATH` variable.
+
 
 ### 4. Configuring AFL-Dyninst Environment Variables
 ```
 export AFL_SKIP_BIN_CHECK=1
-export LD_LIBRARY_PATH=/usr/local/lib
-export DYNINSTAPI_RT_LIB=/usr/local/lib/libdyninstAPI_RT.so
+export LD_LIBRARY_PATH=/path/to/dyninst_install/lib:/path/to/afl-dyninst
+export DYNINSTAPI_RT_LIB=/path/to/dyninst_install/lib/libdyninstAPI_RT.so
 ```
 
 ## TestTrace
-Given input data and sizes dumps, TestTrace will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
+Given input data and sizes dumps, `testtrace` will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
 
 ### Dyninst Mode
 First, verify that you have configured the environment variables described above.
@@ -42,6 +53,11 @@ afl-dyninst -i [path/to/target] -o [path/to/dyninst/instrumented/target] -v
 Then, run as follows:
 ```
 testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -- [path/to/dyninst/instrumented/target] [args]
+```
+NOTE: you made need to disable AFL's check for CPU frequency scaling
+
+```
+export AFL_SKIP_BIN_CHECK=1
 ```
 
 ### QEMU Mode
