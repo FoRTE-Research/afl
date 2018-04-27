@@ -63,7 +63,7 @@ export AFL_SKIP_CPUFREQ=1
 ### QEMU Mode
 First, make sure you've installed QEMU and AFL's QEMU patches:
 ```
-sudo apt-get install libtool-bin libglib2.0-dev
+sudo apt-get install libtool-bin libglib2.0-dev automake
 cd qemu_mode
 sudo ./build_qemu_support.sh
 ```
