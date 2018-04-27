@@ -29,10 +29,10 @@ export DYNINSTAPI_RT_LIB=/usr/local/lib/libdyninstAPI_RT.so
 ```
 
 ## TestTrace
-Given input data and sizes dumps, TestTrace will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump. 
+Given input data and sizes dumps, TestTrace will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
 
 ### Dyninst Mode
-First, verify that you have configured the environment variables described above. 
+First, verify that you have configured the environment variables described above.
 
 Next, instrument the target binary:
 ```
@@ -54,7 +54,6 @@ testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile
 ```
 testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_afl_out -- ./djpeg @@
 ```
-
 
 
 
