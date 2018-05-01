@@ -61,7 +61,22 @@ export AFL_SKIP_CPUFREQ=1
 ```
 
 ### QEMU Mode
-Skip pre-instrumenting the target and run with the `-Q` argument:
+First, make sure you've built QEMU with AFL's QEMU patches. Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
+
+```
+sudo apt-get install libtool-bin libglib2.0-dev automake bison
+cd qemu_mode
+sudo ./build_qemu_support.sh
+chmod +x ../afl-qemu-trace
+```
+
+AFL looks for Qemu by using the environmental variable `AFL_PATH'
+
+```
+export AFL_PATH=/path/to/afl
+```
+
+To run AFL with QEMU tracing, just skip pre-instrumenting the target and run with the `-Q` argument:
 ```
 testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -Q -- [path/to/target] [args]
 ```
