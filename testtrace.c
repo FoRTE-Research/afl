@@ -8035,10 +8035,11 @@ int main(int argc, char** argv) {
   FILE * outstats = fopen(stats_out, "w+");
   unsigned long exec_start, exec_done;
   char line[256];
-  fprintf(outstats, "exectime_%s\n", qemu_mode ? "qemu" : "dyninst");
+  fprintf(outstats, "exectime_ms_%s\n", qemu_mode ? "qemu" : "dyninst");
 
   init_forkserver(use_argv);
 
+  unsigned int inputCounter = 0;
   while (fgets(line, sizeof(line), sizes)) {
 
     int size;
@@ -8052,11 +8053,12 @@ int main(int argc, char** argv) {
     run_target(use_argv, exec_tmout);
     exec_done = get_cur_time_us(); 
     //printf("%f\n",(float)(exec_done-exec_start)/1000000);
-    fprintf(outstats, "%f\n",(float)(exec_done-exec_start)/1000000);
+    fprintf(outstats, "%.4f\n",(float)(exec_done-exec_start)/1000);
 
     write_bitmap();
 
-    if (stop_soon) break;
+    ++inputCounter;
+    if (stop_soon || inputCounter >= 1000000) break;
   }
 
   if (queue_cur) show_stats();
