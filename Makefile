@@ -24,7 +24,7 @@ MISC_PATH   = $(PREFIX)/share/afl
 
 # PROGS intentionally omit afl-as, which gets installed elsewhere.
 
-PROGS       = testtrace afl-fuzz-saveinputs FSF-AFL-inputgen FSF-AFL-tracer afl-gcc afl-fuzz afl-showmap afl-tmin afl-gotcpu afl-analyze
+PROGS       = testtrace afl-fuzz-saveinputs afl-gcc afl-fuzz afl-showmap afl-tmin afl-gotcpu afl-analyze
 SH_PROGS    = afl-plot afl-cmin afl-whatsup
 
 CFLAGS     ?= -O3 -funroll-loops
@@ -66,12 +66,6 @@ testtrace: testtrace.c $(COMM_HDR) | test_x86
 
 afl-fuzz-saveinputs: afl-fuzz-saveinputs.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
-#FSF-AFL-inputgen: FSF-AFL-inputgen.c $(COMM_HDR) | test_x86
-#	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
-#FSF-AFL-tracer: FSF-AFL-tracer.c $(COMM_HDR) | test_x86
-#	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 afl-gcc: afl-gcc.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
