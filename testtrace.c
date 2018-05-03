@@ -1,3 +1,4 @@
+int BASELINE = 1;
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
@@ -2109,9 +2110,10 @@ static u8 run_target(char** argv, u32 timeout) {
   /* After this memset, trace_bits[] are effectively volatile, so we
      must prevent any earlier operations from venturing into that
      territory. */
-
-  memset(trace_bits, 0, MAP_SIZE);
-  MEM_BARRIER();
+  if(!BASELINE) {
+    memset(trace_bits, 0, MAP_SIZE);
+    MEM_BARRIER();
+  }
 
   s32 res;
   
@@ -2150,11 +2152,10 @@ static u8 run_target(char** argv, u32 timeout) {
   /* Any subsequent operations on trace_bits must not be moved by the
      compiler below this point. Past this location, trace_bits[] behave
      very normally and do not have to be treated as volatile. */
-
-  MEM_BARRIER();
-
-  tb4 = *(u32*)trace_bits;
-
+  if(!BASELINE) {
+    MEM_BARRIER();
+    tb4 = *(u32*)trace_bits;
+  
   // MDH: need to do something here or put back write bitmap
   
 #ifdef __x86_64__
@@ -2162,7 +2163,7 @@ static u8 run_target(char** argv, u32 timeout) {
 #else
   classify_counts((u32*)trace_bits);
 #endif /* ^__x86_64__ */
-
+  }
   prev_timed_out = child_timed_out;
 
   /* Report outcome to caller. */
@@ -7097,11 +7098,15 @@ int main(int argc, char** argv) {
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:s:f:o:m:t:T:dnCB:S:M:x:Q")) > 0)
+  while ((opt = getopt(argc, argv, "+i:s:f:o:m:t:T:dnC:S:M:x:Q:B")) > 0)
 
     switch (opt) {
 
-      case 'i': /* input dump */
+      case 'B': /* perform baseline run */
+              BASELINE = 1;
+        break;
+
+    case 'i': /* input dump */
 
         if (inp_dump) FATAL("Multiple -id options not supported");
         inp_dump = optarg;
@@ -7224,24 +7229,6 @@ int main(int argc, char** argv) {
         use_splicing = 1;
         break;
 
-      case 'B': /* load bitmap */
-
-        /* This is a secret undocumented option! It is useful if you find
-           an interesting test case during a normal fuzzing process, and want
-           to mutate it without rediscovering any of the test cases already
-           found during an earlier run.
-
-           To use this mode, you need to point -B to the fuzz_bitmap produced
-           by an earlier run for the exact same binary... and that's it.
-
-           I only used this once or twice to get variants of a particular
-           file, so I'm not making this an official setting. */
-
-        if (in_bitmap) FATAL("Multiple -B options not supported");
-
-        in_bitmap = optarg;
-        read_bitmap(in_bitmap);
-        break;
 
       case 'C': /* crash mode */
 
