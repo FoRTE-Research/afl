@@ -5,7 +5,7 @@
 *.o
 *.ko
 *.obj
-*.elf
+#*.elf
 
 # Linker output
 *.ilk
@@ -25,7 +25,7 @@
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
-*.so.*
+#*.so.*
 *.dylib
 
 # Executables
@@ -44,12 +44,33 @@
 
 # OS generated files 
 .DS_Store
+.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# AFL-specific binaries
+afl-analyze
+afl-as
+afl-cmin
+afl-fuzz
+afl-fuzz-saveinputs
+afl-gotcpu
+afl-plot
+afl-qemu-trace
+afl-showmap
+afl-tmin
+afl-whatsup
+FSF-AFL-inputgen
+FSF-AFL-tracer
+
+# Misc folders
+.idea/
+cmake-build-debug/CMakeFiles/
+
 
 # Kernel Module Compile Results
 *.mod*
