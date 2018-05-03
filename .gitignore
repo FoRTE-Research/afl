@@ -43,6 +43,7 @@
 *.pdb
 
 # OS generated files 
+*.DS_Store
 .DS_Store
 .DS_Store?
 ._*
@@ -65,6 +66,10 @@ afl-tmin
 afl-whatsup
 FSF-AFL-inputgen
 FSF-AFL-tracer
+
+# Misc folders
+.idea/
+cmake-build-debug/CMakeFiles/
 
 
 # Kernel Module Compile Results
