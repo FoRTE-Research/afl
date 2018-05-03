@@ -51,6 +51,22 @@
 ehthumbs.db
 Thumbs.db
 
+# AFL-specific binaries
+afl-analyze
+afl-as
+afl-cmin
+afl-fuzz
+afl-fuzz-saveinputs
+afl-gotcpu
+afl-plot
+afl-qemu-trace
+afl-showmap
+afl-tmin
+afl-whatsup
+FSF-AFL-inputgen
+FSF-AFL-tracer
+
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

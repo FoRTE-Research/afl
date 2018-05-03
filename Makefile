@@ -67,11 +67,11 @@ testtrace: testtrace.c $(COMM_HDR) | test_x86
 afl-fuzz-saveinputs: afl-fuzz-saveinputs.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
-FSF-AFL-inputgen: FSF-AFL-inputgen.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
+#FSF-AFL-inputgen: FSF-AFL-inputgen.c $(COMM_HDR) | test_x86
+#	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
-FSF-AFL-tracer: FSF-AFL-tracer.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
+#FSF-AFL-tracer: FSF-AFL-tracer.c $(COMM_HDR) | test_x86
+#	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 afl-gcc: afl-gcc.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
