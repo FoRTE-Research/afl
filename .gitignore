@@ -63,6 +63,7 @@ afl-showmap
 afl-tmin
 FSF-AFL-inputgen
 FSF-AFL-tracer
+testtrace
 
 # Misc folders
 .idea/
