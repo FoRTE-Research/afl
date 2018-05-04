@@ -18,3 +18,6 @@ export DYNINSTAPI_RT_LIB=/home/mdhicks2/dynInstall/lib/libdyninstAPI_RT.so
 ../testtrace -B -i ../../_ins-dump -s ../../_ins-sizes -f /tmp/res_baseline_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegBase @@
 
 echo end time is `date`
+
+rm -rf /tmp/outDIR_$PBS_JOBID
+mv /tmp/res_baseline_$PBS_JOBID.txt .

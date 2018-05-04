@@ -14,3 +14,7 @@ echo Current directory is `pwd`
 ../testtrace -i ../../_ins-dump -s ../../_ins-sizes -f /tmp/res_wb_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegWB @@
 
 echo end time is `date`
+
+rm -rf /tmp/outDIR_$PBS_JOBID
+mv /tmp/res_wb_$PBS_JOBID.txt .
+
