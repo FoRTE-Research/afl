@@ -55,6 +55,7 @@ Thumbs.db
 # AFL-specific binaries
 afl-analyze
 afl-as
+afl-gcc
 afl-fuzz
 afl-fuzz-saveinputs
 afl-gotcpu
