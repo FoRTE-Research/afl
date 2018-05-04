@@ -1,4 +1,4 @@
-int BASELINE = 1;
+int BASELINE = 0;
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
@@ -2110,7 +2110,7 @@ static u8 run_target(char** argv, u32 timeout) {
   /* After this memset, trace_bits[] are effectively volatile, so we
      must prevent any earlier operations from venturing into that
      territory. */
-  if(!BASELINE) {
+  if(BASELINE == 0) {
     memset(trace_bits, 0, MAP_SIZE);
     MEM_BARRIER();
   }
@@ -2152,7 +2152,7 @@ static u8 run_target(char** argv, u32 timeout) {
   /* Any subsequent operations on trace_bits must not be moved by the
      compiler below this point. Past this location, trace_bits[] behave
      very normally and do not have to be treated as volatile. */
-  if(!BASELINE) {
+  if(BASELINE == 0) {
     MEM_BARRIER();
     tb4 = *(u32*)trace_bits;
   
@@ -7385,7 +7385,7 @@ int main(int argc, char** argv) {
     run_target(use_argv, exec_tmout);
     exec_done = get_cur_time_us(); 
 
-    fprintf(outstats, "%.4f\n",(float)(exec_done-exec_start)/1000);
+    fprintf(outstats, "%.4f\n", (exec_done - exec_start)/1000.0);
 
     ++inputCounter;
     if (stop_soon || inputCounter >= 1000000)
