@@ -1,3 +1,5 @@
+# Create evaluation binaries
+
 Before running the evaluation scripts in this folder, you need to build the required target binaries:
   QEMU: Completely uninstrumented binary
   AFL-gcc: Binary with forkserver and basic block callbacks baked-in at compile time
@@ -39,4 +41,22 @@ Download, build, and instrument with AFL-Dyninst: https://github.com/FoRTE-Resea
   cp /path/to/afl/cluster_eval/djpeg .
   make
   cp djpegInst /path/to/afl/cluster_eval/djpegInst
+  
+  # Prepare evaluation scripts
+  
+  Edit the paths in `youEdit.sh` so that they match where things are on your system.
+  
+  # Run single process test
+  
+  You can run any PBS script as if it were a regular shell script, e.g.,
+  
+  ```
+  sh fuzzConBaseline.pbs
+  ```
+  
+  # Run cluster test
+  
+  ```
+  sh submitJobs.sh
+  ```
   
