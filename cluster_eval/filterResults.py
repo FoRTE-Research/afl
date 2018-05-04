@@ -1,7 +1,12 @@
-fileList = open('resultFileList.txt', 'r')
+import sys
+
+if len(sys.argv) == 1:
+    print 'usage: python getRunTime.py [filename]+'
+    exit()
+
 files = []
-for line in fileList.readlines():
-    files.append(open(line.strip(), 'r'))
+for idx in range(1,len(sys.argv)):
+    files.append(open(sys.argv[idx], 'r'))
 
 # Trim high and low 1/3 outliers
 trimSize = len(files)/3
@@ -33,7 +38,7 @@ for line in files[0].readlines():
 
     runningRate = inputCount / cuml
     
-    print str(orig) + ',0' + str(cuml) + ',' + str(runningRate)
+    print str(orig) + ',' + str(cuml) + ',' + str(runningRate)
 
 
 print 'Total interesting inputs: ' + str(unmodTotal)
