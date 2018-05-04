@@ -3,8 +3,8 @@
 #PBS -o fsf.stdout.$PBS_JOBID
 #PBS -e fsf.stderr.$PBS_JOBID
 
-. youEdit.sh
+. ./youEdit.sh
 
 ../testtrace -i $FSF_DUMP -s $FSF_SIZES -f /tmp/res_wb_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegWB @@
 
-. exitCleanup.sh
+. ./exitCleanup.sh

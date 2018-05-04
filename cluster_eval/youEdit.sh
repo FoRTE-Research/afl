@@ -2,8 +2,8 @@ export FSF_EVAL_DIR=/home/mdhicks2/fuzzing/afl/cluster_eval
 export FSF_AFL_DYNINST=/home/mdhicks2/fuzzing/afl-dyninst
 export FSF_BASELINE_DYNINST=/home/mdhicks2/fuzzing/forkserver-baseline
 export FSF_DYNINST_INSTALL=/home/mdhicks2/dynInstall
-export FSF_DUMP=/home/mdhicks2/fuzzing/_ins-dump_50000ish
-export FSF_SIZES=/home/mdhicks2/fuzzing/_ins-sizes_50000ish
+export FSF_DUMP=/home/mdhicks2/fuzzing/_ins-dump
+export FSF_SIZES=/home/mdhicks2/fuzzing/_ins-sizes
 
 echo PBS default server is $PBS_DEFAULT
 
