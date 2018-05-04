@@ -19,7 +19,7 @@ cp djpeg /path/to/afl/cluster_eval/.
 ```
 
 #### Download and build AFL: https://github.com/FoRTE-Research/afl
-* Follow the provided build instructions
+* Follow the provided build instructions for AFL and Qemu
 
 ```
 export PATH=$PATH:/path/to/afl
