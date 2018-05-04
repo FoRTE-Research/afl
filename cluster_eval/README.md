@@ -34,10 +34,10 @@ make
 cp djpeg /path/to/afl/cluster_eval/djpegWB
 ```
 
-Download and build Dyninst: https://github.com/FoRTE-Research/UnTracer-Fuzzing
+#### Download and build Dyninst: https://github.com/FoRTE-Research/UnTracer-Fuzzing
 * Follow the provided build instructions
 
-Download and build the init-only forkserver instrumentor: https://github.com/FoRTE-Research/forkserver-baseline
+#### Download and build the init-only forkserver instrumentor: https://github.com/FoRTE-Research/forkserver-baseline
 * update `DYN_ROOT` in `Makefile` to the path where you built Dyninst
 
 ```
