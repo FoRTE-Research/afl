@@ -6,7 +6,7 @@ Before running the evaluation scripts in this folder, you need to build the requ
 * Baseline: Binary instrumented with init forkserver
 * AFL-Dyninst: Binary instrumented with init forkserver and basic block callbacks
  
-Download and build the uninstrumented target binary:
+#### Download and build the uninstrumented target binary:
 
 ```
 wget http://www.ijg.org/files/jpegsrc.v9a.tar.gz
@@ -18,14 +18,14 @@ make
 cp djpeg /path/to/afl/cluster_eval/.
 ```
 
-Download and build AFL: https://github.com/FoRTE-Research/afl
+#### Download and build AFL: https://github.com/FoRTE-Research/afl
 * Follow the provided build instructions
 
 ```
 export PATH=$PATH:/path/to/afl
 ```
 
-Create the AFL-gcc instrumented binary:
+#### Create the AFL-gcc instrumented binary:
 
 ```
 cd /path/to/jpeg-9a
@@ -48,7 +48,7 @@ make
 cp djpegInst /path/to/afl/cluster_eval/djpegBaseline
 ```
 
-Download, build, and instrument with AFL-Dyninst: https://github.com/FoRTE-Research/afl-dyninst
+#### Download, build, and instrument with AFL-Dyninst: https://github.com/FoRTE-Research/afl-dyninst
 * update `DYN_ROOT` in `Makefile` to the path where you built Dyninst
 
 ```
