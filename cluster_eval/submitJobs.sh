@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for i in `seq 1 240`
+for i in `seq 1 40`
 do
-#    qsub -l nodes=1:ppn=2 -l walltime=200:00:00 fuzzConDyninst.pbs
-#    qsub -l nodes=1:ppn=2 -l walltime=200:00:00 fuzzConQemu.pbs
-#    qsub -l nodes=1:ppn=2 -l walltime=200:00:00 fuzzConWB.pbs
-    qsub -l nodes=1:ppn=2 -l walltime=200:00:00 fuzzConBaseline.pbs
+    qsub -l nodes=1:ppn=12 -l walltime=200:00:00 -d `pwd` fuzzConDyninst.pbs
+#    qsub -l nodes=1:ppn=12 -l walltime=200:00:00 -d `pwd` fuzzConQemu.pbs
+#    qsub -l nodes=1:ppn=12 -l walltime=200:00:00 -d `pwd` fuzzConWB.pbs
+#    qsub -l nodes=1:ppn=12 -l walltime=200:00:00 -d `pwd` fuzzConBaseline.pbs
 done
