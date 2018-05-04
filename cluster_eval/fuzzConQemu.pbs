@@ -1,0 +1,18 @@
+#!/bin/sh
+#PBS -N FuzzingQemu
+#PBS -o fsf.stdout.$PBS_JOBID
+#PBS -e fsf.stderr.$PBS_JOBID
+
+echo PBS default server is $PBS_DEFAULT
+
+cd /home/mdhicks2/fuzzing/afl/cluster_eval
+
+echo Running on host `hostname`
+echo Start time is `date`
+echo Current directory is `pwd`
+
+export AFL_SKIP_BIN_CHECK=1
+
+../testtrace -i ../../_ins-dump -s ../../_ins-sizes -f /tmp/res_qemu_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -Q -- ./djpeg @@
+
+echo end time is `date`

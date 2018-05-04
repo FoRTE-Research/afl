@@ -1,0 +1,20 @@
+#!/bin/sh
+#PBS -N FuzzingDyninst
+#PBS -o fsf.stdout.$PBS_JOBID
+#PBS -e fsf.stderr.$PBS_JOBID
+
+echo PBS default server is $PBS_DEFAULT
+
+cd /home/mdhicks2/fuzzing/afl/cluster_eval
+
+echo Running on host `hostname`
+echo Start time is `date`
+echo Current directory is `pwd`
+
+export AFL_SKIP_BIN_CHECK=1
+export LD_LIBRARY_PATH=/home/mdhicks2/dynInstall/lib:/home/mdhicks2/fuzzing/forkserver-baseline
+export DYNINSTAPI_RT_LIB=/home/mdhicks2/dynInstall/lib/libdyninstAPI_RT.so
+
+../testtrace -i ../../_ins-dump -s ../../_ins-sizes -f /tmp/res_dyninst_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegInst @@
+
+echo end time is `date`
