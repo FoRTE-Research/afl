@@ -60,3 +60,9 @@ Download, build, and instrument with AFL-Dyninst: https://github.com/FoRTE-Resea
   sh submitJobs.sh
   ```
   
+  # Result processing
+  
+   `getTimes.py` reports the total time taken by all of the results in each passed file.
+   
+   `filterResults.py` outputs a trimmed mean trace given the results in the passed files.
+  
