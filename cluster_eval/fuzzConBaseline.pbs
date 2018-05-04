@@ -5,6 +5,6 @@
 
 . ./youEdit.sh
 
-../testtrace -B -i $FSF_DUMP -s $FSF_SIZES -f /tmp/res_baseline_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegBase @@
+../testtrace -B -i $FSF_DUMP -s $FSF_SIZES -f /tmp/res_baseline_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegBaseline @@
 
 . ./exitCleanup.sh
