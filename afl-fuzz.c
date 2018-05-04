@@ -1,24 +1,19 @@
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
-
    Written and maintained by Michal Zalewski <lcamtuf@google.com>
-
    Forkserver design by Jann Horn <jannhorn@googlemail.com>
-
    Copyright 2013, 2014, 2015, 2016, 2017 Google Inc. All rights reserved.
-
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at:
-
      http://www.apache.org/licenses/LICENSE-2.0
-
    This is the real deal: the program takes an instrumented binary and
    attempts a variety of basic fuzzing tricks, paying close attention to
    how they affect the execution path.
-
  */
+
+#define MAX_MINUTES 1
 
 #define AFL_MAIN
 #define MESSAGES_TO_STDOUT
@@ -79,6 +74,7 @@
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
 
+unsigned long time_start, time_diff;
 
 EXP_ST u8 *in_dir,                    /* Input directory with test cases  */
           *out_file,                  /* File to fuzz, if any             */
@@ -217,7 +213,7 @@ static s32 cpu_core_count;            /* CPU core count                   */
 
 #ifdef HAVE_AFFINITY
 
-static s32 cpu_aff = -1;       	      /* Selected CPU core                */
+static s32 cpu_aff = -1;              /* Selected CPU core                */
 
 #endif /* HAVE_AFFINITY */
 
@@ -871,7 +867,6 @@ EXP_ST void read_bitmap(u8* fname) {
    Update virgin bits to reflect the finds. Returns 1 if the only change is
    the hit-count for a particular tuple; 2 if there are new tuples seen. 
    Updates the map, so subsequent calls will always return 0.
-
    This function is called after every exec() on a fairly large buffer, so
    it needs to be fast. We do this in 32-bit and 64-bit flavors. */
 
@@ -1040,7 +1035,7 @@ static u32 count_non_255_bytes(u8* mem) {
    is hit or not. Called on every new crash or timeout, should be
    reasonably fast. */
 
-static const u8 simplify_lookup[256] = {
+static const u8 simplify_lookup[256] = { 
 
   [0]         = 1,
   [1 ... 255] = 128
@@ -1228,7 +1223,6 @@ static void minimize_bits(u8* dst, u8* src) {
    "favorables" is to have a minimal set of paths that trigger all the bits
    seen in the bitmap so far, and focus on fuzzing them at the expense of
    the rest.
-
    The first step of the process is to maintain a list of top_rated[] entries
    for every byte in the bitmap. We win that slot if there is no previous
    contender, or if the contender has a more favorable speed x size factor. */
@@ -1966,9 +1960,7 @@ static void destroy_extras(void) {
 
 
 /* Spin up fork server (instrumented mode only). The idea is explained here:
-
    http://lcamtuf.blogspot.com/2014/10/fuzzing-binaries-without-execve.html
-
    In essence, the instrumentation allows us to skip execve(), and just keep
    cloning a stopped child. So, we just execute once, and then send commands
    through a pipe. The other part of this logic is in afl-as.h. */
@@ -2260,6 +2252,12 @@ EXP_ST void init_forkserver(char** argv) {
 
 static u8 run_target(char** argv, u32 timeout) {
 
+  time_diff = get_cur_time_us() - time_start;
+  if ((time_start != 0) && time_diff >= (MAX_MINUTES * 60 * 1000000)) {
+    OKF("Time exceeded -  we're done here!\n");
+    exit(0);
+  }
+
   static struct itimerval it;
   static u32 prev_timed_out = 0;
 
@@ -2277,7 +2275,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
   /* If we're running in "dumb" mode, we can't rely on the fork server
      logic compiled into the target program, so we will just keep calling
-     execve(). There is a bit of code duplication between here and
+     execve(). There is a bit of code duplication between here and 
      init_forkserver(), but c'est la vie. */
 
   if (dumb_mode == 1 || no_forkserver) {
@@ -2739,12 +2737,11 @@ static void perform_dry_run(char** argv) {
 
         break;
 
-      
       case FAULT_TMOUT:
 
         if (timeout_given) {
 
-           /*The -t nn+ syntax in the command line sets timeout_given to '2' and
+          /* The -t nn+ syntax in the command line sets timeout_given to '2' and
              instructs afl-fuzz to tolerate but skip queue entries that time
              out. */
 
@@ -2754,7 +2751,6 @@ static void perform_dry_run(char** argv) {
             cal_failures++;
             break;
           }
-          
 
           SAYF("\n" cLRD "[-] " cRST
                "The program took more than %u ms to process one of the initial test cases.\n"
@@ -2779,7 +2775,7 @@ static void perform_dry_run(char** argv) {
           FATAL("Test case '%s' results in a timeout", fn);
 
         }
-      
+
       case FAULT_CRASH:  
 
         if (crash_mode) break;
@@ -2827,6 +2823,7 @@ static void perform_dry_run(char** argv) {
                "    - Least likely, there is a horrible bug in the fuzzer. If other options\n"
                "      fail, poke <lcamtuf@coredump.cx> for troubleshooting tips.\n",
                DMS(mem_limit << 20), mem_limit - 1, doc_path);
+
         } else {
 
           SAYF("\n" cLRD "[-] " cRST
@@ -2856,9 +2853,9 @@ static void perform_dry_run(char** argv) {
 
         FATAL("Unable to execute target application ('%s')", argv[0]);
 
-      case FAULT_NOINST:
+      /*case FAULT_NOINST:
 
-        FATAL("No instrumentation detected");
+        FATAL("No instrumentation detected");*/
 
       case FAULT_NOBITS: 
 
@@ -3130,7 +3127,7 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
     if (!(hnb = has_new_bits(virgin_bits))) {
       if (crash_mode) total_crashes++;
       return 0;
-    }
+    }    
 
 #ifndef SIMPLE_FILES
 
@@ -3475,7 +3472,6 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps) {
   prev_md  = max_depth;
 
   /* Fields in the file:
-
      unix_time, cycles_done, cur_path, paths_total, paths_not_fuzzed,
      favored_not_fuzzed, unique_crashes, unique_hangs, max_depth,
      execs_per_sec */
@@ -4409,7 +4405,6 @@ static void show_init_stats(void) {
 
     /* Figure out the appropriate timeout. The basic idea is: 5x average or
        1x max, rounded up to EXEC_TM_ROUND ms and capped at 1 second.
-
        If the program is slow, the multiplier is lowered to 2x or 3x, because
        random scheduler jitter is less likely to have any impact, and because
        our patience is wearing thin =) */
@@ -5124,28 +5119,22 @@ static u8 fuzz_one(char** argv) {
     /* While flipping the least significant bit in every byte, pull of an extra
        trick to detect possible syntax tokens. In essence, the idea is that if
        you have a binary blob like this:
-
        xxxxxxxxIHDRxxxxxxxx
-
        ...and changing the leading and trailing bytes causes variable or no
        changes in program flow, but touching any character in the "IHDR" string
        always produces the same, distinctive path, it's highly likely that
        "IHDR" is an atomically-checked magic value of special significance to
        the fuzzed format.
-
        We do this here, rather than as a separate stage, because it's a nice
        way to keep the operation approximately "free" (i.e., no extra execs).
-
+       
        Empirically, performing the check when flipping the least significant bit
        is advantageous, compared to doing it at the time of more disruptive
        changes, where the program flow may be affected in more violent ways.
-
        The caveat is that we won't generate dictionaries in the -d mode or -S
        mode - but that's probably a fair trade-off.
-
        This won't work particularly well with paths that exhibit variable
        behavior, but fails gracefully, so we'll carry out the checks anyway.
-
       */
 
     if (!dumb_mode && (stage_cur & 7) == 7) {
@@ -5181,7 +5170,7 @@ static u8 fuzz_one(char** argv) {
 
       if (cksum != queue_cur->exec_cksum) {
 
-        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];
+        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];        
         a_len++;
 
       }
@@ -5254,11 +5243,9 @@ static u8 fuzz_one(char** argv) {
   stage_cycles[STAGE_FLIP4] += stage_max;
 
   /* Effector map setup. These macros calculate:
-
      EFF_APOS      - position of a particular file offset in the map.
      EFF_ALEN      - length of a map with a particular number of bytes.
      EFF_SPAN_ALEN - map span for a sequence of bytes.
-
    */
 
 #define EFF_APOS(_p)          ((_p) >> EFF_MAP_SCALE2)
@@ -5522,11 +5509,11 @@ skip_bitflip:
           r4 = orig ^ SWAP16(SWAP16(orig) - j);
 
       /* Try little endian addition and subtraction first. Do it only
-         if the operation would affect more than one byte (hence the
+         if the operation would affect more than one byte (hence the 
          & 0xff overflow checks) and if it couldn't be a product of
          a bitflip. */
 
-      stage_val_type = STAGE_VAL_LE;
+      stage_val_type = STAGE_VAL_LE; 
 
       if ((orig & 0xff) + j > 0xff && !could_be_bitflip(r1)) {
 
@@ -5535,7 +5522,7 @@ skip_bitflip:
 
         if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
         stage_cur++;
-
+ 
       } else stage_max--;
 
       if ((orig & 0xff) < j && !could_be_bitflip(r2)) {
@@ -5954,7 +5941,7 @@ skip_interest:
     for (j = 0; j < extras_cnt; j++) {
 
       if (len + extras[j].len > MAX_FILE) {
-        stage_max--;
+        stage_max--; 
         continue;
       }
 
@@ -6091,7 +6078,7 @@ havoc_stage:
     u32 use_stacking = 1 << (1 + UR(HAVOC_STACK_POW2));
 
     stage_cur_val = use_stacking;
-
+ 
     for (i = 0; i < use_stacking; i++) {
 
       switch (UR(15 + ((extras_cnt + a_extras_cnt) ? 2 : 0))) {
@@ -6103,7 +6090,7 @@ havoc_stage:
           FLIP_BIT(out_buf, UR(temp_len << 3));
           break;
 
-        case 1:
+        case 1: 
 
           /* Set byte to interesting value. */
 
@@ -6137,7 +6124,7 @@ havoc_stage:
           if (temp_len < 4) break;
 
           if (UR(2)) {
-
+  
             *(u32*)(out_buf + UR(temp_len - 3)) =
               interesting_32[UR(sizeof(interesting_32) >> 2)];
 
@@ -7504,7 +7491,7 @@ static void check_asan_opts(void) {
 
   }
 
-}
+} 
 
 
 /* Detect @@ in args. */
@@ -7706,9 +7693,6 @@ static void save_cmdline(u32 argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-  time_t t_start;
-  time_t t_end = 8;
-
   s32 opt;
   u64 prev_queued = 0;
   u32 sync_interval_cnt = 0, seek_to;
@@ -7854,10 +7838,8 @@ int main(int argc, char** argv) {
            an interesting test case during a normal fuzzing process, and want
            to mutate it without rediscovering any of the test cases already
            found during an earlier run.
-
            To use this mode, you need to point -B to the fuzz_bitmap produced
            by an earlier run for the exact same binary... and that's it.
-
            I only used this once or twice to get variants of a particular
            file, so I'm not making this an official setting. */
 
@@ -8003,7 +7985,8 @@ int main(int argc, char** argv) {
     if (stop_soon) goto stop_fuzzing;
   }
 
-  t_start = time(NULL);
+  time_start = get_cur_time_us();
+  time_diff = 0;
 
   while (1) {
 
@@ -8062,8 +8045,6 @@ int main(int argc, char** argv) {
 
     queue_cur = queue_cur->next;
     current_entry++;
-
-    //if (t_start >= t_end) exit(0);
 
   }
 
