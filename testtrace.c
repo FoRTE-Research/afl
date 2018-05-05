@@ -1,4 +1,6 @@
 int BASELINE = 0;
+unsigned long exec_start, exec_done;
+
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
@@ -56,6 +58,8 @@ int BASELINE = 0;
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <sys/file.h>
+
+FILE * bbfd;
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined (__OpenBSD__)
 #  include <sys/sysctl.h>
@@ -2120,6 +2124,8 @@ static u8 run_target(char** argv, u32 timeout) {
   /* In non-dumb mode, we have the fork server up and running, so simply
      tell it to have at it, and then read back PID. */
 
+  exec_start = get_cur_time_us(); 
+
   if ((res = write(fsrv_ctl_fd, &prev_timed_out, 4)) != 4) {
 
     if (stop_soon) return 0;
@@ -2127,7 +2133,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
     }
 
-  if ((res = read(fsrv_st_fd, &child_pid, 4)) != 4) {
+  /* if ((res = read(fsrv_st_fd, &child_pid, 4)) != 4) {
 
     if (stop_soon) return 0;
     RPFATAL(res, "Unable to request new process from fork server (OOM?)");
@@ -2144,6 +2150,8 @@ static u8 run_target(char** argv, u32 timeout) {
     RPFATAL(res, "Unable to communicate with fork server (OOM?)");
 
   }
+  exec_done = get_cur_time_us(); 
+
 
   if (!WIFSTOPPED(status)) child_pid = 0;
 
@@ -2155,11 +2163,14 @@ static u8 run_target(char** argv, u32 timeout) {
   if(BASELINE == 0) {
     MEM_BARRIER();
     tb4 = *(u32*)trace_bits;
-  
-  // MDH: need to do something here or put back write bitmap
-  
+
+    // MDH: need to do something here or put back write bitmap
+    if(has_new_bits(virgin_bits))
+      fprintf(bbfd, "%lld\n", total_execs);
+
 #ifdef __x86_64__
   classify_counts((u64*)trace_bits);
+  
 #else
   classify_counts((u32*)trace_bits);
 #endif /* ^__x86_64__ */
@@ -7080,14 +7091,13 @@ static void save_cmdline(u32 argc, char** argv) {
 #ifndef AFL_LIB
 
 /* Main entry point */
-
 int main(int argc, char** argv) {
-
   s32 opt;
   u8  *extras_dir = 0;
   u8  mem_limit_given = 0;
   char** use_argv;
-
+  bbfd = fopen("dyn_map_out.txt", "w");
+  
   struct timeval tv;
   struct timezone tz;
 
@@ -7350,7 +7360,6 @@ int main(int argc, char** argv) {
   FILE * inputs = fopen(inp_dump, "rb");
   FILE * sizes  = fopen(inp_sizes, "r");
   FILE * outstats = fopen(stats_out, "w+");
-  unsigned long exec_start, exec_done;
   char line[256];
   fprintf(outstats, "exectime_ms_%s\n", qemu_mode ? "qemu" : "dyninst");
 
@@ -7381,9 +7390,7 @@ int main(int argc, char** argv) {
     }    
     fclose(tmp_input);
 
-    exec_start = get_cur_time_us(); 
     run_target(use_argv, exec_tmout);
-    exec_done = get_cur_time_us(); 
 
     fprintf(outstats, "%.4f\n", (exec_done - exec_start)/1000.0);
 
