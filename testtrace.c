@@ -59,7 +59,7 @@ unsigned long exec_start, exec_done;
 #include <sys/ioctl.h>
 #include <sys/file.h>
 
-FILE * bbfd;
+int bbfd;
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined (__OpenBSD__)
 #  include <sys/sysctl.h>
@@ -1879,8 +1879,9 @@ EXP_ST void init_forkserver(char** argv) {
 
     setsid();
 
-    dup2(dev_null_fd, 1);
-    dup2(dev_null_fd, 2);
+    dup2(bbfd, 1);
+    //dup2(dev_null_fd, 1);
+    //dup2(dev_null_fd, 2);
 
     if (out_file) {
 
@@ -2133,7 +2134,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
     }
 
-  /* if ((res = read(fsrv_st_fd, &child_pid, 4)) != 4) {
+   if ((res = read(fsrv_st_fd, &child_pid, 4)) != 4) {
 
     if (stop_soon) return 0;
     RPFATAL(res, "Unable to request new process from fork server (OOM?)");
@@ -2166,7 +2167,7 @@ static u8 run_target(char** argv, u32 timeout) {
 
     // MDH: need to do something here or put back write bitmap
     if(has_new_bits(virgin_bits))
-      fprintf(bbfd, "%lld\n", total_execs);
+      ;//fprintf(bbfd, "%lld\n", total_execs);
 
 #ifdef __x86_64__
   classify_counts((u64*)trace_bits);
@@ -7096,7 +7097,7 @@ int main(int argc, char** argv) {
   u8  *extras_dir = 0;
   u8  mem_limit_given = 0;
   char** use_argv;
-  bbfd = fopen("dyn_map_out.txt", "w");
+  bbfd = open("dyn_map_out.txt", O_RDWR | O_CREAT, 0666);
   
   struct timeval tv;
   struct timezone tz;
