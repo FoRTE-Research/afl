@@ -6438,28 +6438,15 @@ static void usage(u8* argv0) {
 
        "Required parameters:\n\n"
 
-       "  -i dir        - input directory with test cases\n"
-       "  -o dir        - output directory for fuzzer findings\n\n"
+       "  -i file       - input dump file\n"
+       "  -s file       - input sizes file\n"
+       "  -f file       - output execution time logfile\n"
+       "  -o dir        - output (working) directory\n\n"
 
-       "Execution control settings:\n\n"
-
-       "  -f file       - location read by the fuzzed program (stdin)\n"
-       "  -t msec       - timeout for each run (auto-scaled, 50-%u ms)\n"
-       "  -m megs       - memory limit for child process (%u MB)\n"
+       "Optional control settings:\n\n"
+       "  -B            - set empty shared memory bitmap (baseline mode) \n"  
        "  -Q            - use binary-only instrumentation (QEMU mode)\n\n"     
  
-       "Fuzzing behavior settings:\n\n"
-
-       "  -d            - quick & dirty mode (skips deterministic steps)\n"
-       "  -n            - fuzz without instrumentation (dumb mode)\n"
-       "  -x dir        - optional fuzzer dictionary (see README)\n\n"
-
-       "Other stuff:\n\n"
-
-       "  -T text       - text banner to show on the screen\n"
-       "  -M / -S id    - distributed mode (see parallel_fuzzing.txt)\n"
-       "  -C            - crash exploration mode (the peruvian rabbit thing)\n\n"
-
        "For additional tips, please consult %s/README.\n\n",
 
        argv0, EXEC_TIMEOUT, MEM_LIMIT, doc_path);
@@ -7286,7 +7273,6 @@ int main(int argc, char** argv) {
 
     }
 
-  //if (optind == argc || !in_dir || !out_dir) usage(argv[0]);
   if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out) usage(argv[0]);
 
   setup_signal_handlers();
@@ -7294,8 +7280,18 @@ int main(int argc, char** argv) {
 
   if (sync_id) fix_up_sync();
 
-  //if (!strcmp(in_dir, out_dir))
-  //  FATAL("Input and output directories can't be the same");
+  /* Check validity of dump and sizes file */
+  if (access(inp_dump, F_OK) == -1) {
+    perror("Input dump file invalid!");
+    exit(EXIT_FAILURE);
+  }
+  if (access(inp_sizes, F_OK) == -1) {
+    perror("Inout sizes file invalid!");
+    exit(EXIT_FAILURE);
+  }
+
+  if (!strcmp(inp_dump, inp_sizes))
+    FATAL("Input dump and sizes can't be the same");
 
   if (dumb_mode) {
     FATAL("dumb mode not supported");
@@ -7373,7 +7369,7 @@ int main(int argc, char** argv) {
   FILE * sizes  = fopen(inp_sizes, "r");
   FILE * outstats = fopen(stats_out, "w+");
   char line[256];
-  fprintf(outstats, "exectime_ms_%s\n", qemu_mode ? "qemu" : "dyninst");
+  fprintf(outstats, "exectime\n");
 
   init_forkserver(use_argv);
 
