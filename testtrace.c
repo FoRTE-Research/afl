@@ -59,7 +59,9 @@ unsigned long exec_start, exec_done;
 #include <sys/ioctl.h>
 #include <sys/file.h>
 
-int bbfd;
+int stdout_dump_fd;
+int stderr_dump_fd;
+
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined (__OpenBSD__)
 #  include <sys/sysctl.h>
@@ -1879,9 +1881,8 @@ EXP_ST void init_forkserver(char** argv) {
 
     setsid();
 
-    dup2(bbfd, 1);
-    //dup2(dev_null_fd, 1);
-    //dup2(dev_null_fd, 2);
+    dup2(stdout_dump_fd, 1);
+    dup2(stdout_dump_fd, 2);
 
     if (out_file) {
 
@@ -6553,6 +6554,17 @@ EXP_ST void setup_dirs_fds(void) {
 
   }
 
+  /* stdout and stderr fds */
+  tmp = alloc_printf("%s/stdout.dump", out_dir);
+  stdout_dump_fd = open(tmp, O_WRONLY | O_CREAT, 0666);
+  if (stdout_dump_fd < 0) PFATAL("Unable to create '%s'", tmp);
+  ck_free(tmp);
+
+  tmp = alloc_printf("%s/stderr.dump", out_dir);
+  stderr_dump_fd = open(tmp, O_WRONLY | O_CREAT, 0666);
+  if (stderr_dump_fd < 0) PFATAL("Unable to create '%s'", tmp);
+  ck_free(tmp);
+
   /* All recorded crashes. */
 
   tmp = alloc_printf("%s/crashes", out_dir);
@@ -7097,7 +7109,6 @@ int main(int argc, char** argv) {
   u8  *extras_dir = 0;
   u8  mem_limit_given = 0;
   char** use_argv;
-  bbfd = open("dyn_map_out.txt", O_RDWR | O_CREAT, 0666);
   
   struct timeval tv;
   struct timezone tz;
