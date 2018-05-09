@@ -6440,16 +6440,16 @@ static void usage(u8* argv0) {
 
        "  -i file       - input dump file\n"
        "  -s file       - input sizes file\n"
-       "  -f file       - output execution time logfile\n"
+       "  -f file       - output exectime logfile\n"
        "  -o dir        - output (working) directory\n\n"
 
-       "Optional control settings:\n\n"
-       "  -B            - set empty shared memory bitmap (baseline mode) \n"  
+       "Execution control settings:\n\n"
+       "  -B            - set empty shared memory bitmap (baseline mode)\n"
        "  -Q            - use binary-only instrumentation (QEMU mode)\n\n"     
- 
+
        "For additional tips, please consult %s/README.\n\n",
 
-       argv0, EXEC_TIMEOUT, MEM_LIMIT, doc_path);
+       argv0, doc_path);
 
   exit(1);
 
