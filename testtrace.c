@@ -1,6 +1,3 @@
-int BASELINE = 0;
-unsigned long exec_start, exec_done;
-
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
@@ -59,8 +56,6 @@ unsigned long exec_start, exec_done;
 #include <sys/ioctl.h>
 #include <sys/file.h>
 
-int stdout_dump_fd;
-int stderr_dump_fd;
 
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined (__OpenBSD__)
@@ -85,6 +80,14 @@ int stderr_dump_fd;
 
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
+
+unsigned int max_execs = 0;
+unsigned int inputCounter = 0;
+int stdout_dump_fd;
+int stderr_dump_fd;
+int BASELINE = 0;
+unsigned long exec_start, exec_done;
+
 EXP_ST u8 *inp_dump,
           *inp_sizes,
           *stats_out;
@@ -6441,7 +6444,8 @@ static void usage(u8* argv0) {
        "  -i file       - input dump file\n"
        "  -s file       - input sizes file\n"
        "  -f file       - output exectime logfile\n"
-       "  -o dir        - output (working) directory\n\n"
+       "  -o dir        - output (working) directory\n"
+       "  -c int        - numer of execs to process before terminating\n\n"
 
        "Execution control settings:\n\n"
        "  -B            - set empty shared memory bitmap (baseline mode)\n"
@@ -7100,14 +7104,14 @@ int main(int argc, char** argv) {
   struct timeval tv;
   struct timezone tz;
 
-  SAYF(cCYA "afl-fuzz " cBRI VERSION cRST " by <lcamtuf@google.com>\n");
+  SAYF(cCYA "testtrace" cBRI " based on afl-fuzz " VERSION cRST " by <FoRTE-Research> and <lcamtuf@google.com>\n");
 
   doc_path = access(DOC_PATH, F_OK) ? "docs" : DOC_PATH;
 
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:s:f:o:m:t:T:dnC:S:M:x:Q:B")) > 0)
+  while ((opt = getopt(argc, argv, "+i:s:f:o:c:m:t:T:dnC:S:M:x:Q:B")) > 0)
 
     switch (opt) {
 
@@ -7117,14 +7121,14 @@ int main(int argc, char** argv) {
 
     case 'i': /* input dump */
 
-        if (inp_dump) FATAL("Multiple -id options not supported");
+        if (inp_dump) FATAL("Multiple -i options not supported");
         inp_dump = optarg;
 
         break;
 
       case 's': /* input sizes */
 
-        if (inp_sizes) FATAL("Multiple -is options not supported");
+        if (inp_sizes) FATAL("Multiple -s options not supported");
         inp_sizes = optarg;
 
         break;
@@ -7140,6 +7144,12 @@ int main(int argc, char** argv) {
 
         if (out_dir) FATAL("Multiple -o options not supported");
         out_dir = optarg;
+        break;
+
+      case 'c': /* output dir */
+
+        if (max_execs) FATAL("Multiple -c options not supported");
+        max_execs = atoi(optarg);
         break;
 
       case 'M': { /* master sync ID */
@@ -7273,7 +7283,7 @@ int main(int argc, char** argv) {
 
     }
 
-  if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out) usage(argv[0]);
+  if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out || !max_execs) usage(argv[0]);
 
   setup_signal_handlers();
   check_asan_opts();
@@ -7373,7 +7383,7 @@ int main(int argc, char** argv) {
 
   init_forkserver(use_argv);
 
-  unsigned int inputCounter = 0;
+  //int inputCounter = 0;
   while (fgets(line, sizeof(line), sizes)) {
 
     int size = atoi(line);  
@@ -7403,7 +7413,8 @@ int main(int argc, char** argv) {
     fprintf(outstats, "%.4f\n", (exec_done - exec_start)/1000.0);
 
     ++inputCounter;
-    if (stop_soon || inputCounter >= 1000000)
+
+    if (stop_soon || inputCounter >= max_execs)
       break;
   }
 

@@ -52,7 +52,7 @@ afl-dyninst -i [path/to/target] -o [path/to/dyninst/instrumented/target] -v
 
 Then, run as follows:
 ```
-testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -- [path/to/dyninst/instrumented/target] [args]
+testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [path/to/out/dir/] -c [numer_of_execs] -- [path/to/dyninst/instrumented/target] [args]
 ```
 NOTE: you made need to disable AFL's check for CPU frequency scaling
 
@@ -78,12 +78,12 @@ export AFL_PATH=/path/to/afl
 
 To run AFL with QEMU tracing, just skip pre-instrumenting the target and run with the `-Q` argument:
 ```
-testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [afl/out/directory/] -Q -- [path/to/target] [args]
+testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [path/to/out/dir/] -c 50000 -Q -- [path/to/target] [args]
 ```
 
 ### Example usage:
 ```
-testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_afl_out -- ./djpeg @@
+testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c 50000 -- ./djpeg @@
 ```
 
 
