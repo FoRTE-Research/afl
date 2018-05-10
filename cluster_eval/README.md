@@ -23,6 +23,7 @@ cp djpeg /path/to/afl/cluster_eval/.
 
 ```
 export PATH=$PATH:/path/to/afl
+export AFL_PATH=/path/to/afl
 ```
 
 #### Create the AFL-gcc instrumented binary:
