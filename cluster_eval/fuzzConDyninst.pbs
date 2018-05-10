@@ -5,6 +5,6 @@
 
 . ./youEdit.sh
 
-../testtrace -i $FSF_DUMP -s $FSF_SIZES -f /tmp/res_dyninst_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -- ./djpegInst @@
+../testtrace -i $FSF_DUMP -s $FSF_SIZES -f /tmp/res_dyninst_$PBS_JOBID.txt -o /tmp/outDIR_$PBS_JOBID -c $FSF_NUM_INPUTS -- ./djpegInst @@
 
 . ./exitCleanup.sh
