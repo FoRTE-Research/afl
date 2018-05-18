@@ -49,7 +49,6 @@ export DYNINST_INSTALL =[/path/to/dyninst/install/dir]
 export AFL_DIR =[/path/to/afl/dir]
 export AFLDYNINST_DIR =[/path/to/afl-dyninst/dir
 export UNTRACER_DIR =[/path/to/untracer/dir]
-
 ```
 
 Run setup.sh:
