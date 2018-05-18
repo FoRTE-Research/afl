@@ -85,6 +85,7 @@ unsigned int max_execs = 0;
 unsigned int inputCounter = 0;
 int stdout_dump_fd;
 int stderr_dump_fd;
+int save_dumps = 0;
 int BASELINE = 0;
 unsigned long exec_start, exec_done;
 
@@ -1884,8 +1885,15 @@ EXP_ST void init_forkserver(char** argv) {
 
     setsid();
 
-    dup2(stdout_dump_fd, 1);
-    dup2(stdout_dump_fd, 2);
+    /* If user wants to save dumps (debugging), do so. Otherwise pipe to /dev/null. */
+    if (save_dumps){
+      dup2(stdout_dump_fd, 1);
+      dup2(stdout_dump_fd, 2);
+    }
+    else{
+      dup2(dev_null_fd, 1);
+      dup2(dev_null_fd, 2);
+    }
 
     if (out_file) {
 
@@ -7111,12 +7119,16 @@ int main(int argc, char** argv) {
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:s:f:o:c:m:t:T:dnC:S:M:x:Q:B")) > 0)
+  while ((opt = getopt(argc, argv, "+i:s:f:o:c:m:t:T:dnC:S:M:x:Q:Bz")) > 0)
 
     switch (opt) {
 
-      case 'B': /* perform baseline run */
-              BASELINE = 1;
+    case 'z':
+        save_dumps=1;
+        break;
+
+    case 'B': /* perform baseline run */
+        BASELINE = 1;
         break;
 
     case 'i': /* input dump */
@@ -7284,6 +7296,11 @@ int main(int argc, char** argv) {
     }
 
   if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out || !max_execs) usage(argv[0]);
+
+  /* If max_execs is 0, go with 4 billion. Hack to get super large input processing. */
+  if (max_execs <= 0){
+    max_execs = 0xFFFFFFFF;
+  }
 
   setup_signal_handlers();
   check_asan_opts();

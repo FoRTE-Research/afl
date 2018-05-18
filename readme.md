@@ -74,6 +74,8 @@ make clean && make all
 ## TestTrace
 Given input data and sizes dumps, `testtrace` will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
 
+Only non-position-independent target binaries are supported. Be sure to compile all target binaries with the `-no-pie` compiler flag.
+
 First, launch the setup_envs script corresponding to the desired target. e.g.:
 ```
 . setup_envs/setup_djpeg.sh
