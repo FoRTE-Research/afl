@@ -24,12 +24,12 @@ Note that the build may finish with an error even though `afl-qemu-trace` was bu
 
 
 
-### 2. Install Dyninst
+### 3. Install Dyninst
 See here: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
 
 
 
-### 3. Download AFL-Dyninst and UnTracer
+### 4. Download AFL-Dyninst and UnTracer
 ```
 git clone https://github.com/FoRTE-Research/afl-dyninst
 git clone https://github.com/FoRTE-Research/untracer
@@ -37,7 +37,7 @@ git clone https://github.com/FoRTE-Research/untracer
 
 
 
-### 4. Configure environment variables
+### 5. Configure environment variables
 ```
 git clone https://github.com/FoRTE-Research/setup_envs
 cd setup_envs
@@ -64,7 +64,7 @@ Run setup.sh:
 
 
 
-### 5. Install AFL-Dyninst and UnTracer
+### 6. Install AFL-Dyninst and UnTracer
 
 Update `DYN_ROOT` in `afl-dyninst/Makefile` to Dyninst's install directory. Then, install AFL-Dyninst
 ```
