@@ -4,87 +4,141 @@ This repository contains several modified versions of AFL.
 
 ## Getting Started
 
-### 1. Installation
+### 1. Download and install AFL
 ```
 git clone https://github.com/FoRTE-Research/afl
 cd afl
 make all
 ```
 
-Add `/path/to/afl` to your system's `PATH` variable. 
 
-### 2. Installing Dyninst
+### 2. Install QEMU:
+
+```
+sudo apt-get install libtool-bin libglib2.0-dev automake bison
+cd afl/qemu_mode
+sudo ./build_qemu_support.sh
+chmod +x ../afl-qemu-trace
+``
+Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
+
+
+
+### 2. Install Dyninst
 See here: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
 
-### 3. Installing AFL-Dyninst
 
+
+### 3. Download AFL-Dyninst and UnTracer
 ```
 git clone https://github.com/FoRTE-Research/afl-dyninst
-cd afl-dyninst
+git clone https://github.com/FoRTE-Research/untracer
 ```
 
-Update `DYN_ROOT` in `Makefile` to where you installed Dyninst.
-
-```
-make all
-```
-
-Add `/path/to/afl-dyninst` to your system's `PATH` variable.
 
 
-### 4. Configuring AFL-Dyninst Environment Variables
+### 4. Configure environment variables
 ```
-export AFL_SKIP_BIN_CHECK=1
-export LD_LIBRARY_PATH=/path/to/dyninst_install/lib:/path/to/afl-dyninst
-export DYNINSTAPI_RT_LIB=/path/to/dyninst_install/lib/libdyninstAPI_RT.so
+git clone https://github.com/FoRTE-Research/setup_envs
+cd setup_envs
 ```
+
+Edit setup.sh:
+```
+export DYNINST_INSTALL 	=[/path/to/dyninst/install/dir]
+
+export AFL_DIR 			=[/path/to/afl/dir]
+export AFLDYNINST_DIR	=[/path/to/afl-dyninst/dir
+export UNTRACER_DIR		=[/path/to/untracer/dir]
+
+export LD_LIBRARY_PATH=$DYNINST_INSTALL/lib:$AFLDYNINST_DIR:$UNTRACER_DIR
+
+export DYNINSTAPI_RT_LIB=$DYNINST_INSTALL/lib/libdyninstAPI_RT.so
+
+```
+
+Run setup.sh:
+```
+. ./setup.sh
+```
+
+
+
+### 5. Install AFL-Dyninst and UnTracer
+
+Update `DYN_ROOT` in `afl-dyninst/Makefile` to Dyninst's install directory. Then, install AFL-Dyninst
+```
+make clean && make all
+```
+Likewise, update `DYN_ROOT` in `untracer/Makefile` to Dyninst's install directory. Then, install UnTracer:
+
+make clean && make all
+```
+
+
 
 ## TestTrace
 Given input data and sizes dumps, `testtrace` will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
 
-### Dyninst Mode
-First, verify that you have configured the environment variables described above.
-
-Next, instrument the target binary:
+First, launch the setup_envs script corresponding to the desired target. e.g.:
 ```
-afl-dyninst -i [path/to/target] -o [path/to/dyninst/instrumented/target] -v
+. setup_envs/setup_djpeg.sh
 ```
 
-Then, run as follows:
-```
-testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [path/to/out/dir/] -c [numer_of_execs] -- [path/to/dyninst/instrumented/target] [args]
-```
-NOTE: you made need to disable AFL's check for CPU frequency scaling
 
+
+### Forkserver-only (baseline) tracing mode
+Instrument the target binary using UnTracerInst's Dyninst-based forkserver-only mode:
 ```
-export AFL_SKIP_CPUFREQ=1
+UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
 ```
 
-### QEMU Mode
-First, make sure you've built QEMU with AFL's QEMU patches. Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
-
+Run as follows:
 ```
-sudo apt-get install libtool-bin libglib2.0-dev automake bison
-cd qemu_mode
-sudo ./build_qemu_support.sh
-chmod +x ../afl-qemu-trace
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
 ```
 
-AFL looks for Qemu by using the environmental variable `AFL_PATH'
 
+
+### AFL-GCC tracing mode
+Recompile the target binary using AFL-GCC instrumentation:
 ```
-export AFL_PATH=/path/to/afl
+cd /path/to/target/source
+./configure CC="afl-gcc" CXX="afl-g++" --disable-shared
+make clean
+make install
 ```
 
-To run AFL with QEMU tracing, just skip pre-instrumenting the target and run with the `-Q` argument:
+Run as follows:
 ```
-testtrace -i [path/to/input/data/dump] -s [path/to/input/sizes/dump] -f [outfile] -o [path/to/out/dir/] -c 50000 -Q -- [path/to/target] [args]
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
 ```
+
+
+
+### AFL-Dyninst mode
+Instrument the target binary using AFL-Dyninst:
+```
+afl-dyninst -i [/path/to/target] -o [/path/to/instrumented/target] -v
+```
+
+Run as follows:
+```
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
+```
+
+
+
+### AFL-QEMU tracing mode
+
+Skip instrumentation and run with the additional `-Q` directive as follows:
+```
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -Q -- [/path/to/target] [target_args]
+```
+
+
 
 ### Example usage:
 ```
 testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c 50000 -- ./djpeg @@
 ```
-
-
-
