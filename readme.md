@@ -19,7 +19,7 @@ sudo apt-get install libtool-bin libglib2.0-dev automake bison
 cd afl/qemu_mode
 sudo ./build_qemu_support.sh
 chmod +x ../afl-qemu-trace
-``
+```
 Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
 
 
