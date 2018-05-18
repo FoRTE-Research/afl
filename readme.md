@@ -12,7 +12,7 @@ make all
 ```
 
 
-### 2. Install QEMU:
+### 2. Install QEMU
 
 ```
 sudo apt-get install libtool-bin libglib2.0-dev automake bison
@@ -71,7 +71,7 @@ Update `DYN_ROOT` in `afl-dyninst/Makefile` to Dyninst's install directory. Then
 make clean && make all
 ```
 Likewise, update `DYN_ROOT` in `untracer/Makefile` to Dyninst's install directory. Then, install UnTracer:
-
+```
 make clean && make all
 ```
 
