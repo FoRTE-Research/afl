@@ -45,15 +45,10 @@ cd setup_envs
 
 Edit setup.sh:
 ```
-export DYNINST_INSTALL 	=[/path/to/dyninst/install/dir]
-
-export AFL_DIR 			=[/path/to/afl/dir]
-export AFLDYNINST_DIR	=[/path/to/afl-dyninst/dir
-export UNTRACER_DIR		=[/path/to/untracer/dir]
-
-export LD_LIBRARY_PATH=$DYNINST_INSTALL/lib:$AFLDYNINST_DIR:$UNTRACER_DIR
-
-export DYNINSTAPI_RT_LIB=$DYNINST_INSTALL/lib/libdyninstAPI_RT.so
+export DYNINST_INSTALL =[/path/to/dyninst/install/dir]
+export AFL_DIR =[/path/to/afl/dir]
+export AFLDYNINST_DIR =[/path/to/afl-dyninst/dir
+export UNTRACER_DIR =[/path/to/untracer/dir]
 
 ```
 
