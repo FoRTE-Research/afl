@@ -81,7 +81,7 @@
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
 
-unsigned int max_execs = 0;
+unsigned int max_execs;
 unsigned int inputCounter = 0;
 int stdout_dump_fd;
 int stderr_dump_fd;
@@ -6449,15 +6449,15 @@ static void usage(u8* argv0) {
 
        "Required parameters:\n\n"
 
-       "  -i file       - input dump file\n"
-       "  -s file       - input sizes file\n"
-       "  -f file       - output exectime logfile\n"
-       "  -o dir        - output (working) directory\n"
-       "  -c int        - numer of execs to process before terminating\n\n"
+       "  -i file       - Input dump file.\n"
+       "  -s file       - Input sizes file.\n"
+       "  -f file       - Output exectime logfile.\n"
+       "  -o dir        - Output (working) directory.\n"
+       "  -c int        - Number execs to process. Use 'F' to process FULL dump.\n\n"
 
        "Execution control settings:\n\n"
-       "  -B            - set empty shared memory bitmap (baseline mode)\n"
-       "  -Q            - use binary-only instrumentation (QEMU mode)\n\n"     
+       "  -B            - Set empty shared memory bitmap (baseline mode).\n"
+       "  -Q            - Use binary-only instrumentation (QEMU mode).\n\n"     
 
        "For additional tips, please consult %s/README.\n\n",
 
@@ -7158,10 +7158,12 @@ int main(int argc, char** argv) {
         out_dir = optarg;
         break;
 
-      case 'c': /* output dir */
-
-        if (max_execs) FATAL("Multiple -c options not supported");
-        max_execs = atoi(optarg);
+      case 'c': 
+        if (strcmp(optarg, "F") == 0){
+          max_execs = 100000000;
+        }
+        else 
+          max_execs = atoi(optarg);
         break;
 
       case 'M': { /* master sync ID */

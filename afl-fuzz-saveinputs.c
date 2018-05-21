@@ -2513,7 +2513,7 @@ static void write_to_testcase(void* mem, u32 len) {
 static void write_to_testcase(void* mem, u32 len) {
 
   
-  if (get_cur_time() - start_time > 100*1000){
+  if (get_cur_time() - start_time > 24*60*60*1000){
     exit(0);
   }
   
