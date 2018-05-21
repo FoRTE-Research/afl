@@ -91,7 +91,7 @@ UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
 
 Run as follows:
 ```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | "F" for full dump] -- [/path/to/instrumented/target] [target_args]
 ```
 
 
@@ -107,7 +107,7 @@ make install
 
 Run as follows:
 ```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | "F" for full dump] -- [/path/to/instrumented/target] [target_args]
 ```
 
 
@@ -120,7 +120,7 @@ afl-dyninst -i [/path/to/target] -o [/path/to/instrumented/target] -v
 
 Run as follows:
 ```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -- [/path/to/instrumented/target] [target_args]
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | "F" for full dump] -- [/path/to/instrumented/target] [target_args]
 ```
 
 
@@ -129,7 +129,7 @@ testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/
 
 Skip instrumentation and run with the additional `-Q` directive as follows:
 ```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs] -Q -- [/path/to/target] [target_args]
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | "F" for full dump] -Q -- [/path/to/target] [target_args]
 ```
 
 
@@ -137,4 +137,5 @@ testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/
 ### Example usage:
 ```
 testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c 50000 -- ./djpeg @@
+testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c F -- ./djpeg @@
 ```
