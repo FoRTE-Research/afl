@@ -14,6 +14,7 @@ tar -xzf jpegsrc.v9a.tar.gz
 rm jpegsrc.v9a.tar.gz
 cd jpeg-9a
 ./configure --disable-shared
+# Append -no-pie to cflags in Makefile
 make
 cp djpeg /path/to/afl/cluster_eval/.
 ```
