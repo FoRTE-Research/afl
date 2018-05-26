@@ -1,10 +1,10 @@
-export FSF_NUM_INPUTS=50000
+export FSF_NUM_INPUTS=F
 export FSF_EVAL_DIR=/home/mdhicks2/fuzzing/afl/cluster_eval
 export FSF_AFL_DYNINST=/home/mdhicks2/fuzzing/afl-dyninst
-export FSF_BASELINE_DYNINST=/home/mdhicks2/fuzzing/forkserver-baseline
+export FSF_BASELINE_DYNINST=/home/mdhicks2/fuzzing/UnTracer
 export FSF_DYNINST_INSTALL=/home/mdhicks2/dynInstall
-export FSF_DUMP=/home/mdhicks2/fuzzing/_ins-dump
-export FSF_SIZES=/home/mdhicks2/fuzzing/_ins-sizes
+export FSF_DUMP=/home/mdhicks2/fuzzing/_ins-dump_50000ish
+export FSF_SIZES=/home/mdhicks2/fuzzing/_ins-sizes_50000ish
 export LD_LIBRARY_PATH=$FSF_DYNINST_INSTALL/lib:$FSF_BASELINE_DYNINST:$FSF_AFL_DYNINST
 export DYNINSTAPI_RT_LIB=$FSF_DYNINST_INSTALL/lib/libdyninstAPI_RT.so
 
