@@ -15,7 +15,7 @@ make all
 ### 2. Install QEMU
 
 ```
-sudo apt-get install libtool-bin libglib2.0-dev automake bison
+sudo apt-get install libtool-bin libglib2.0-dev automake flex bison
 cd afl/qemu_mode
 sudo ./build_qemu_support.sh
 chmod +x ../afl-qemu-trace
