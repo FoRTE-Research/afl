@@ -103,7 +103,7 @@ cd /path/to/target/source
 ./configure CC="afl-gcc" CXX="afl-g++" --disable-shared
 # edit Makefile to add '-no-pie' to CFLAGS
 make clean
-make install
+make
 ```
 
 Run as follows:
