@@ -101,6 +101,7 @@ Recompile the target binary using AFL-GCC instrumentation:
 ```
 cd /path/to/target/source
 ./configure CC="afl-gcc" CXX="afl-g++" --disable-shared
+# edit Makefile to add '-no-pie' to CFLAGS
 make clean
 make install
 ```
