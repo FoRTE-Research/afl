@@ -65,6 +65,7 @@ afl-tmin
 FSF-AFL-inputgen
 FSF-AFL-tracer
 testtrace
+qemu_mode/qemu-2.10.0/
 
 # Misc folders
 .idea/
