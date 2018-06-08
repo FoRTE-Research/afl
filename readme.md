@@ -73,9 +73,10 @@ make clean && make all
 ## AFL-Fuzz-SaveInputs
 Syntax:
 ```
-afl-fuzz -i [/path/to/seeddir] -o [/path/to/outdir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
+afl-fuzz-saveinputs -i [/path/to/seeddir] -o [/path/to/outdir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
 Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.
+
 Note that QEMU mode is recommended (otherwise dumps will be explosively large in size).
 
 
