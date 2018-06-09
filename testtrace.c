@@ -2124,6 +2124,10 @@ static u8 run_target(char** argv, u32 timeout) {
 
   child_timed_out = 0;
 
+  __asm__ __volatile__ ("" ::: "memory");
+  exec_start = get_cur_time_us();
+  __asm__ __volatile__ ("" ::: "memory");
+  
   /* After this memset, trace_bits[] are effectively volatile, so we
      must prevent any earlier operations from venturing into that
      territory. */
@@ -2136,8 +2140,6 @@ static u8 run_target(char** argv, u32 timeout) {
   
   /* In non-dumb mode, we have the fork server up and running, so simply
      tell it to have at it, and then read back PID. */
-
-  exec_start = get_cur_time_us(); 
 
   if ((res = write(fsrv_ctl_fd, &prev_timed_out, 4)) != 4) {
 
@@ -2163,8 +2165,6 @@ static u8 run_target(char** argv, u32 timeout) {
     RPFATAL(res, "Unable to communicate with fork server (OOM?)");
 
   }
-  exec_done = get_cur_time_us(); 
-
 
   if (!WIFSTOPPED(status)) child_pid = 0;
 
@@ -2189,6 +2189,10 @@ static u8 run_target(char** argv, u32 timeout) {
 #endif /* ^__x86_64__ */
   }
   prev_timed_out = child_timed_out;
+
+  __asm__ __volatile__ ("" ::: "memory");
+  exec_done = get_cur_time_us();
+  __asm__ __volatile__ ("" ::: "memory");  
 
   /* Report outcome to caller. */
 
