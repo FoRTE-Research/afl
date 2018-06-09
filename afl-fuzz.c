@@ -13,8 +13,6 @@
    how they affect the execution path.
  */
 
-#define MAX_MINUTES 1
-
 #define AFL_MAIN
 #define MESSAGES_TO_STDOUT
 
@@ -73,8 +71,6 @@
 
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
-
-unsigned long time_start, time_diff;
 
 EXP_ST u8 *in_dir,                    /* Input directory with test cases  */
           *out_file,                  /* File to fuzz, if any             */
@@ -2252,12 +2248,6 @@ EXP_ST void init_forkserver(char** argv) {
 
 static u8 run_target(char** argv, u32 timeout) {
 
-  time_diff = get_cur_time_us() - time_start;
-  if ((time_start != 0) && time_diff >= (MAX_MINUTES * 60 * 1000000)) {
-    OKF("Time exceeded -  we're done here!\n");
-    exit(0);
-  }
-
   static struct itimerval it;
   static u32 prev_timed_out = 0;
 
@@ -2853,9 +2843,9 @@ static void perform_dry_run(char** argv) {
 
         FATAL("Unable to execute target application ('%s')", argv[0]);
 
-      /*case FAULT_NOINST:
+      case FAULT_NOINST:
 
-        FATAL("No instrumentation detected");*/
+        FATAL("No instrumentation detected");
 
       case FAULT_NOBITS: 
 
@@ -7984,9 +7974,6 @@ int main(int argc, char** argv) {
     start_time += 4000;
     if (stop_soon) goto stop_fuzzing;
   }
-
-  time_start = get_cur_time_us();
-  time_diff = 0;
 
   while (1) {
 

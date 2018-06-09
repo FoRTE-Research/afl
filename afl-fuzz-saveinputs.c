@@ -1,23 +1,16 @@
 /*
    american fuzzy lop - fuzzer code
    --------------------------------
-
    Written and maintained by Michal Zalewski <lcamtuf@google.com>
-
    Forkserver design by Jann Horn <jannhorn@googlemail.com>
-
    Copyright 2013, 2014, 2015, 2016, 2017 Google Inc. All rights reserved.
-
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at:
-
      http://www.apache.org/licenses/LICENSE-2.0
-
    This is the real deal: the program takes an instrumented binary and
    attempts a variety of basic fuzzing tricks, paying close attention to
    how they affect the execution path.
-
  */
 
 #define AFL_MAIN
@@ -78,7 +71,8 @@
 
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
-EXP_ST u8 *FSF_ins_dir;
+
+int exit_time;                        /* Number of minutes before terminating. */
 
 EXP_ST u8 *in_dir,                    /* Input directory with test cases  */
           *out_file,                  /* File to fuzz, if any             */
@@ -217,7 +211,7 @@ static s32 cpu_core_count;            /* CPU core count                   */
 
 #ifdef HAVE_AFFINITY
 
-static s32 cpu_aff = -1;       	      /* Selected CPU core                */
+static s32 cpu_aff = -1;              /* Selected CPU core                */
 
 #endif /* HAVE_AFFINITY */
 
@@ -871,7 +865,6 @@ EXP_ST void read_bitmap(u8* fname) {
    Update virgin bits to reflect the finds. Returns 1 if the only change is
    the hit-count for a particular tuple; 2 if there are new tuples seen. 
    Updates the map, so subsequent calls will always return 0.
-
    This function is called after every exec() on a fairly large buffer, so
    it needs to be fast. We do this in 32-bit and 64-bit flavors. */
 
@@ -1228,7 +1221,6 @@ static void minimize_bits(u8* dst, u8* src) {
    "favorables" is to have a minimal set of paths that trigger all the bits
    seen in the bitmap so far, and focus on fuzzing them at the expense of
    the rest.
-
    The first step of the process is to maintain a list of top_rated[] entries
    for every byte in the bitmap. We win that slot if there is no previous
    contender, or if the contender has a more favorable speed x size factor. */
@@ -1966,9 +1958,7 @@ static void destroy_extras(void) {
 
 
 /* Spin up fork server (instrumented mode only). The idea is explained here:
-
    http://lcamtuf.blogspot.com/2014/10/fuzzing-binaries-without-execve.html
-
    In essence, the instrumentation allows us to skip execve(), and just keep
    cloning a stopped child. So, we just execute once, and then send commands
    through a pipe. The other part of this logic is in afl-as.h. */
@@ -2260,8 +2250,6 @@ EXP_ST void init_forkserver(char** argv) {
 
 static u8 run_target(char** argv, u32 timeout) {
 
-  static double ratio;
-
   static struct itimerval it;
   static u32 prev_timed_out = 0;
 
@@ -2419,15 +2407,6 @@ static u8 run_target(char** argv, u32 timeout) {
 
   total_execs++;
 
-  /* WHY SEGFAULT ?????????? */
-  FILE * queue_ratio = fopen("queue_ratio.txt", "af");
-
-  ratio = (double)queued_paths / (double) total_execs;
-
-  fprintf(queue_ratio, "%f\n", ratio);
-  fclose(queue_ratio);
-
-
   /* Any subsequent operations on trace_bits must not be moved by the
      compiler below this point. Past this location, trace_bits[] behave
      very normally and do not have to be treated as volatile. */
@@ -2469,42 +2448,8 @@ static u8 run_target(char** argv, u32 timeout) {
 
   return FAULT_NONE;
 
-
-
 }
 
-
-
-
-/*
-static void write_to_testcase(void* mem, u32 len) {
-  
-  s32 fd = out_fd;
-
-  time_t cur_t = time(0);
-  struct tm* t = localtime(&cur_t);
-
-  u8* nfn = alloc_printf(".%04u-%02u-%02u-%02u:%02u:%02u",
-                           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-                           t->tm_hour, t->tm_min, t->tm_sec);
-  
-  u8* fn = alloc_printf("%s/inputs/.input_%06u", out_dir, nfn);
-  
-  unlink(fn); // Ignore errors
-  
-  fd = open(fn, O_RDWR | O_CREAT | O_EXCL, 0600);
-  
-  if (fd < 0) PFATAL("Unable to create '%s'", fn);
-
-  else lseek(fd, 0, SEEK_SET);
-
-  ck_write(fd, mem, len, out_file);
-
-  close(fd);
-  
-  ck_free(fn);
-}
-*/
 
 /* Write modified data to file for testing. If out_file is set, the old file
    is unlinked and a new one is created. Otherwise, out_fd is rewound and
@@ -2512,41 +2457,49 @@ static void write_to_testcase(void* mem, u32 len) {
 
 static void write_to_testcase(void* mem, u32 len) {
 
-  
-  if (get_cur_time() - start_time > 24*60*60*1000){
+  /* First, check to see if time budget has been exceeded. */
+  if (get_cur_time() - start_time > exit_time*60*1000){
     exit(0);
   }
   
-  u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
-  s32 id_mem = open(in_mem, O_RDWR | O_CREAT | O_APPEND, 0600);
+  /* Append input memory to dump file and verify correctness. */
+  u8 * path_dump = alloc_printf("%s/_INPUT_DUMP", out_dir);
+  FILE * file_dump  = fopen(path_dump, "a");
+  if (fwrite(mem, 1, len, file_dump) != len){
+    perror("fwrite() file_dump!");
+    exit(EXIT_FAILURE);
+  }
+  fclose(file_dump); 
 
-  u8* in_len  = alloc_printf("%s/_ins-sizes", out_dir);
-  FILE *out = fopen(in_len, "a"); 
-  
-  fprintf(out, "%u\n", len);  
-  fclose(out);  
+  /* Append input size to sizes file. */
+  u8 * path_sizes = alloc_printf("%s/_INPUT_SIZES", out_dir);
+  FILE *file_sizes = fopen(path_sizes, "a"); 
+  fprintf(file_sizes, "%u\n", len);  
+  fclose(file_sizes);  
 
-  write(id_mem, mem, len);
-  close(id_mem);  
-
-
+  /* Carry on... */
   s32 fd = out_fd;
 
   if (out_file) {
+
     unlink(out_file); /* Ignore errors. */
+
     fd = open(out_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
+
     if (fd < 0) PFATAL("Unable to create '%s'", out_file);
+
   } else lseek(fd, 0, SEEK_SET);
 
   ck_write(fd, mem, len, out_file);
 
   if (!out_file) {
+
     if (ftruncate(fd, len)) PFATAL("ftruncate() failed");
     lseek(fd, 0, SEEK_SET);
+
   } else close(fd);
 
 }
-
 
 
 /* The same, but with an adjustable gap. Used for trimming. */
@@ -2797,15 +2750,13 @@ static void perform_dry_run(char** argv) {
 
         break;
 
-      // Commented out for testing purposes
-      /*
       case FAULT_TMOUT:
 
         if (timeout_given) {
 
-           //The -t nn+ syntax in the command line sets timeout_given to '2' and
-           // instructs afl-fuzz to tolerate but skip queue entries that time
-           // out. 
+          /* The -t nn+ syntax in the command line sets timeout_given to '2' and
+             instructs afl-fuzz to tolerate but skip queue entries that time
+             out. */
 
           if (timeout_given > 1) {
             WARNF("Test case results in a timeout (skipping)");
@@ -2813,7 +2764,6 @@ static void perform_dry_run(char** argv) {
             cal_failures++;
             break;
           }
-          
 
           SAYF("\n" cLRD "[-] " cRST
                "The program took more than %u ms to process one of the initial test cases.\n"
@@ -2838,7 +2788,7 @@ static void perform_dry_run(char** argv) {
           FATAL("Test case '%s' results in a timeout", fn);
 
         }
-      */
+
       case FAULT_CRASH:  
 
         if (crash_mode) break;
@@ -2886,6 +2836,7 @@ static void perform_dry_run(char** argv) {
                "    - Least likely, there is a horrible bug in the fuzzer. If other options\n"
                "      fail, poke <lcamtuf@coredump.cx> for troubleshooting tips.\n",
                DMS(mem_limit << 20), mem_limit - 1, doc_path);
+
         } else {
 
           SAYF("\n" cLRD "[-] " cRST
@@ -3534,7 +3485,6 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps) {
   prev_md  = max_depth;
 
   /* Fields in the file:
-
      unix_time, cycles_done, cur_path, paths_total, paths_not_fuzzed,
      favored_not_fuzzed, unique_crashes, unique_hangs, max_depth,
      execs_per_sec */
@@ -3877,6 +3827,16 @@ static void maybe_delete_out_dir(void) {
   }
 
   if (delete_files(fn, CASE_PREFIX)) goto dir_cleanup_failed;
+  ck_free(fn);
+
+  /* Clean up input dump and sizes files. */
+
+  fn = alloc_printf("%s/_INPUT_DUMP", out_dir);
+  if (unlink(fn) && errno != ENOENT) goto dir_cleanup_failed;
+  ck_free(fn);
+
+  fn = alloc_printf("%s/_INPUT_SIZES", out_dir);
+  if (unlink(fn) && errno != ENOENT) goto dir_cleanup_failed;
   ck_free(fn);
 
   /* And now, for some finishing touches. */
@@ -4468,7 +4428,6 @@ static void show_init_stats(void) {
 
     /* Figure out the appropriate timeout. The basic idea is: 5x average or
        1x max, rounded up to EXEC_TM_ROUND ms and capped at 1 second.
-
        If the program is slow, the multiplier is lowered to 2x or 3x, because
        random scheduler jitter is less likely to have any impact, and because
        our patience is wearing thin =) */
@@ -5104,7 +5063,7 @@ static u8 fuzz_one(char** argv) {
   /************
    * TRIMMING *
    ************/
-  /*
+
   if (!dumb_mode && !queue_cur->trim_done) {
 
     u8 res = trim_case(argv, queue_cur, in_buf);
@@ -5116,8 +5075,8 @@ static u8 fuzz_one(char** argv) {
       cur_skipped_paths++;
       goto abandon_entry;
     }
-  
-    //Don't retry trimming, even if it failed. 
+
+    /* Don't retry trimming, even if it failed. */
 
     queue_cur->trim_done = 1;
 
@@ -5126,8 +5085,6 @@ static u8 fuzz_one(char** argv) {
   }
 
   memcpy(out_buf, in_buf, len);
-
-  */
 
   /*********************
    * PERFORMANCE SCORE *
@@ -5185,28 +5142,22 @@ static u8 fuzz_one(char** argv) {
     /* While flipping the least significant bit in every byte, pull of an extra
        trick to detect possible syntax tokens. In essence, the idea is that if
        you have a binary blob like this:
-
        xxxxxxxxIHDRxxxxxxxx
-
        ...and changing the leading and trailing bytes causes variable or no
        changes in program flow, but touching any character in the "IHDR" string
        always produces the same, distinctive path, it's highly likely that
        "IHDR" is an atomically-checked magic value of special significance to
        the fuzzed format.
-
        We do this here, rather than as a separate stage, because it's a nice
        way to keep the operation approximately "free" (i.e., no extra execs).
        
        Empirically, performing the check when flipping the least significant bit
        is advantageous, compared to doing it at the time of more disruptive
        changes, where the program flow may be affected in more violent ways.
-
        The caveat is that we won't generate dictionaries in the -d mode or -S
        mode - but that's probably a fair trade-off.
-
        This won't work particularly well with paths that exhibit variable
        behavior, but fails gracefully, so we'll carry out the checks anyway.
-
       */
 
     if (!dumb_mode && (stage_cur & 7) == 7) {
@@ -5315,11 +5266,9 @@ static u8 fuzz_one(char** argv) {
   stage_cycles[STAGE_FLIP4] += stage_max;
 
   /* Effector map setup. These macros calculate:
-
      EFF_APOS      - position of a particular file offset in the map.
      EFF_ALEN      - length of a map with a particular number of bytes.
      EFF_SPAN_ALEN - map span for a sequence of bytes.
-
    */
 
 #define EFF_APOS(_p)          ((_p) >> EFF_MAP_SCALE2)
@@ -7143,14 +7092,6 @@ static void usage(u8* argv0) {
 
 EXP_ST void setup_dirs_fds(void) {
 
-  unlink("trace.txt");
-  unlink("queue_ratio.txt");
-
-  u8* in_mem  = alloc_printf("%s/_ins-dump", out_dir);
-  unlink(in_mem);
-  u8* in_len  = alloc_printf("%s/_ins-sizes", out_dir);
-  unlink(in_len);
-
   u8* tmp;
   s32 fd;
 
@@ -7749,7 +7690,7 @@ static void save_cmdline(u32 argc, char** argv) {
   u8* buf;
 
   for (i = 0; i < argc; i++)
-    len += strlen(argv[i]) + 1; 
+    len += strlen(argv[i]) + 1;
   
   buf = orig_cmdline = ck_alloc(len);
 
@@ -7793,7 +7734,7 @@ int main(int argc, char** argv) {
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:Q")) > 0)
+  while ((opt = getopt(argc, argv, "+i:o:e:f:m:t:T:dnCB:S:M:x:Q")) > 0)
 
     switch (opt) {
 
@@ -7810,6 +7751,12 @@ int main(int argc, char** argv) {
 
         if (out_dir) FATAL("Multiple -o options not supported");
         out_dir = optarg;
+        break;
+
+      case 'e': /* output dir */
+
+        if (exit_time) FATAL("Multiple -e options not supported");
+        exit_time = atoi(optarg);
         break;
 
       case 'M': { /* master sync ID */
@@ -7920,10 +7867,8 @@ int main(int argc, char** argv) {
            an interesting test case during a normal fuzzing process, and want
            to mutate it without rediscovering any of the test cases already
            found during an earlier run.
-
            To use this mode, you need to point -B to the fuzz_bitmap produced
            by an earlier run for the exact same binary... and that's it.
-
            I only used this once or twice to get variants of a particular
            file, so I'm not making this an official setting. */
 
@@ -7966,20 +7911,6 @@ int main(int argc, char** argv) {
         usage(argv[0]);
 
     }
-
-  // Hack to get ARGV working across both STDIN and @@ versions. ONLY works for QEMU -Q!
-  /*
-  char resolved_path[PATH_MAX]; 
-  char * path = argv[2];
-  char * bname = basename(path);
-  char * dname = realpath(path, resolved_path);
-
-  int x = strlen(dname) - strlen(bname) - 1;
-  dname[x] = 0;
-  FSF_ins_dir = alloc_printf("%s/FullSpeedFuzzing_%s/inputs", dname, bname);
-  in_dir = alloc_printf("%s/FullSpeedFuzzing_%s/seeds", dname, bname);
-  out_dir = alloc_printf("%s/FullSpeedFuzzing_%s/out_AFL", dname, bname);
-  */
 
   if (optind == argc || !in_dir || !out_dir) usage(argv[0]);
 
@@ -8082,7 +8013,7 @@ int main(int argc, char** argv) {
     start_time += 4000;
     if (stop_soon) goto stop_fuzzing;
   }
-  
+
   while (1) {
 
     u8 skipped_fuzz;

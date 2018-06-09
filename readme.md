@@ -15,7 +15,7 @@ make all
 ### 2. Install QEMU
 
 ```
-sudo apt-get install libtool-bin libglib2.0-dev automake bison
+sudo apt-get install libtool-bin libglib2.0-dev automake flex bison
 cd afl/qemu_mode
 sudo ./build_qemu_support.sh
 chmod +x ../afl-qemu-trace
@@ -70,6 +70,15 @@ make clean && make all
 ```
 
 
+## AFL-Fuzz-SaveInputs
+Syntax:
+```
+afl-fuzz-saveinputs -i [/path/to/seeddir] -o [/path/to/outdir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
+```
+Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.
+
+Note that QEMU mode is recommended (otherwise dumps will be explosively large in size).
+
 
 ## TestTrace
 Given input data and sizes dumps, `testtrace` will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
@@ -101,8 +110,9 @@ Recompile the target binary using AFL-GCC instrumentation:
 ```
 cd /path/to/target/source
 ./configure CC="afl-gcc" CXX="afl-g++" --disable-shared
+# edit Makefile to add '-no-pie' to CFLAGS
 make clean
-make install
+make
 ```
 
 Run as follows:
