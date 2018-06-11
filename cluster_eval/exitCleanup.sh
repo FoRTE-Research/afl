@@ -1,4 +1,4 @@
 echo end time is `date`
 
-rm -rf /tmp/outDIR_$PBS_JOBID
-mv /tmp/res_*_$PBS_JOBID.txt .
+rm -rf outDIR_$PBS_JOBID
+mv res_*_$PBS_JOBID.txt /media/sf_hugeData/.
