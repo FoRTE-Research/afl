@@ -7954,6 +7954,11 @@ int main(int argc, char** argv) {
   else
     use_argv = argv + optind;
 
+  for (int i=0; i<argc; i++){
+    printf("%s\n", use_argv[i]);
+  }
+  exit(0);
+
   perform_dry_run(use_argv);
 
   cull_queue();
