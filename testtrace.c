@@ -3809,12 +3809,12 @@ static void show_init_stats(void) {
 
     if (exec_tmout > EXEC_TIMEOUT) exec_tmout = EXEC_TIMEOUT;
     */
-    exec_tmout = 100;
+    exec_tmout = DEFAULT_TIMEOUT;
 
     ACTF("No -t option specified, so I'll use exec timeout of %u ms.", 
          exec_tmout);
 
-    timeout_given = DEFAULT_TIMEOUT;
+    timeout_given = 1;
 
   } else if (timeout_given == 3) {
 
