@@ -3791,15 +3791,6 @@ static void show_init_stats(void) {
 
   }
 
-  OKF("Here are some useful stats:\n\n"
-
-      cGRA "    Test case count : " cRST "%u favored, %u variable, %u total\n"
-      cGRA "       Bitmap range : " cRST "%u to %u bits (average: %0.02f bits)\n"
-      cGRA "        Exec timing : " cRST "%s to %s us (average: %s us)\n",
-      queued_favored, queued_variable, queued_paths, min_bits, max_bits, 
-      ((double)total_bitmap_size) / (total_bitmap_entries ? total_bitmap_entries : 1),
-      DI(min_us), DI(max_us), DI(avg_us));
-
   if (!timeout_given) {
 
     /* Figure out the appropriate timeout. The basic idea is: 5x average or
@@ -4189,34 +4180,25 @@ static void check_term_size(void) {
 
 }
 
+/* Displays usage hints. */
+void usage(char ** argv) {
 
+    printf("\n%s [ parameters ] -- /path/to/fuzzed_app [ ... ]\n\n"
 
-/* Display usage hints. */
+    "Parameters:\n\n"
 
-static void usage(u8* argv0) {
+    "   -i file         - input dump file\n"
+    "   -s file         - input sizes file\n"
+    "   -o dir          - output working directory\n"
+    "   -f file         - output results file\n"    
+    "   -c int          - (optional) number inputs before terminating\n"
+    "   -t int          - (optional) exec timeout (ms)\n"
+    "   -B              - (optional) set empty SHM (baseline mode)\n"
+    "   -Q              - (optional) use QEMU mode\n\n"  , 
 
-  SAYF("\n%s [ options ] -- /path/to/fuzzed_app [ ... ]\n\n"
-
-       "Required parameters:\n\n"
-
-       "  -i file       - Input dump file.\n"
-       "  -s file       - Input sizes file.\n"
-       "  -f file       - Output exectime logfile.\n"
-       "  -o dir        - Output (working) directory.\n"
-       "  -c int        - Number execs to process. Use 'F' to process FULL dump.\n\n"
-
-       "Execution control settings:\n\n"
-       "  -B            - Set empty shared memory bitmap (baseline mode).\n"
-       "  -Q            - Use binary-only instrumentation (QEMU mode).\n\n"     
-
-       "For additional tips, please consult %s/README.\n\n",
-
-       argv0, doc_path);
-
-  exit(1);
-
+    argv[0]);
+    exit(1);
 }
-
 
 /* Prepare output directories and fds. */
 
@@ -5050,11 +5032,11 @@ int main(int argc, char** argv) {
 
       default:
 
-        usage(argv[0]);
+        usage(argv);
 
     }
 
-  if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out) usage(argv[0]);
+  if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out) usage(argv);
 
   setup_signal_handlers();
   check_asan_opts();
