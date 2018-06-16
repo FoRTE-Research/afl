@@ -5,6 +5,6 @@
 
 . ./youEdit.sh
 
-../testtrace -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_qemu_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -t 100 -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
+../testtrace -t 100 -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_qemu_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
 
 . ./exitCleanup.sh
