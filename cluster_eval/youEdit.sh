@@ -1,4 +1,4 @@
-. ./djpeg.sh
+. ./benchmark.sh
 export FSF_INPUTS_PATH=/media/sf_hugeData/$FSF_BENCH
 export FSF_EVAL_DIR=/home/mdhicks2/Desktop/afl/cluster_eval
 export FSF_AFL_DYNINST=/home/mdhicks2/Desktop/afl-dyninst
