@@ -1758,8 +1758,8 @@ EXP_ST void init_forkserver(char** argv) {
       dup2(stdout_dump_fd, 2);
     }
     else{
-      //dup2(dev_null_fd, 1);
-      //dup2(dev_null_fd, 2);
+      dup2(dev_null_fd, 1);
+      dup2(dev_null_fd, 2);
     }
 
     if (out_file) {
