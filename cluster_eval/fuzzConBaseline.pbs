@@ -5,6 +5,8 @@
 
 . ./youEdit.sh
 
-../testtrace -B -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_baseline_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -c $FSF_NUM_INPUTS -t 100 -- ./${FSF_BENCH}OriginalBaseline $FSF_BENCH_ARGS
+echo ../testtrace -B -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_baseline_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -c $FSF_NUM_INPUTS -t 100 -- ./${FSF_BENCH}Baseline $FSF_BENCH_ARGS
+
+../testtrace -B -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_baseline_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -c $FSF_NUM_INPUTS -t 100 -- ./${FSF_BENCH}Baseline $FSF_BENCH_ARGS
 
 . ./exitCleanup.sh
