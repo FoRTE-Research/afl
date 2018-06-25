@@ -57,7 +57,8 @@ static u8   be_quiet,           /* Quiet mode (no stderr output)        */
             clang_mode,         /* Running in clang mode?               */
             pass_thru,          /* Just pass data through?              */
             just_version,       /* Just show version?                   */
-            sanitizer;          /* Using ASAN / MSAN                    */
+            sanitizer,          /* Using ASAN / MSAN                    */
+            fsrv_only;          /* Use forkserver-only instrumentation? */
 
 static u32  inst_ratio = 100,   /* Instrumentation probability (%)      */
             as_par_cnt = 1;     /* Number of params to 'as'             */
@@ -80,7 +81,6 @@ static u8   use_64bit = 0;
 
 #endif /* ^__x86_64__ */
 
-
 /* Examine and modify parameters to pass to 'as'. Note that the file name
    is always the last parameter passed by GCC, so we exploit this property
    to keep the code simple. */
@@ -88,7 +88,17 @@ static u8   use_64bit = 0;
 static void edit_params(int argc, char** argv) {
 
   u8 *tmp_dir = getenv("TMPDIR"), *afl_as = getenv("AFL_AS");
-  u32 i;
+  u32 i, j;
+
+  /* Scan argv and remove "-F", if present; we don't want to pass it to as. */
+  for (i = 0; i < argc; i++)
+    if (!strcmp(argv[i], "-F"))
+      break;
+  if (i < argc){
+    argc = argc - 1;
+    for (j = i; j < argc; j++)
+      argv[j] = argv[j + 1];
+  }
 
 #ifdef __APPLE__
 
@@ -359,9 +369,10 @@ static void add_instrumentation(void) {
 
     /* Conditional branch instruction (jnz, etc). We append the instrumentation
        right after the branch (to instrument the not-taken path) and at the
-       branch destination label (handled later on). */
+       branch destination label (handled later on). 
+       This is only done in non-forkserver-only mode. */
 
-    if (line[0] == '\t') {
+    if (!fsrv_only && line[0] == '\t') {
 
       if (line[1] == 'j' && line[2] != 'm' && R(100) < inst_ratio) {
 
@@ -425,26 +436,38 @@ static void add_instrumentation(void) {
 
              We use deferred output chiefly to avoid disrupting
              .Lfunc_begin0-style exception handling calculations (a problem on
-             MacOS X). */
+             MacOS X).
+             
+             In forkserver-only mode, we want both conditions to be 0. */ 
 
-          if (!skip_next_label) instrument_next = 1; else skip_next_label = 0;
-
+          if (fsrv_only && !skip_next_label) instrument_next = 0; 
+          if (!fsrv_only && !skip_next_label) instrument_next = 1; 
+          else skip_next_label = 0;
         }
 
       } else {
 
-        /* Function label (always instrumented, deferred mode). */
+        /* Function label (always instrumented, deferred mode). 
+           In forkserver-only mode, we only instrument <main>. */
 
-        instrument_next = 1;
-    
+        if (fsrv_only){
+          if (strstr(line, "main:") != NULL) instrument_next = 1;   
+          else instrument_next = 0;
+        }
+        else 
+          instrument_next = 1;
+
       }
 
     }
 
   }
 
-  if (ins_lines)
+  if (ins_lines && !fsrv_only)
     fputs(use_64bit ? main_payload_64 : main_payload_32, outf);
+
+  if (ins_lines && fsrv_only)
+    fputs(just_forkserver_64, outf);
 
   if (input_file) fclose(inf);
   fclose(outf);
@@ -472,6 +495,20 @@ int main(int argc, char** argv) {
   u32 rand_seed;
   int status;
   u8* inst_ratio_str = getenv("AFL_INST_RATIO");
+
+  /* By default, we avoid forkserver-only instrumentation. */
+  fsrv_only = 0; 
+
+  /* Scan assembler args ("gcc [gcc-args] -Wa,[as-args]") for "-F". */
+  s32 opt;
+  while ((opt = getopt(argc, argv, "F")) > 0){
+
+    switch (opt) {
+      case 'F':
+        fsrv_only = 1;
+        break;
+    }
+  }
 
   struct timeval tv;
   struct timezone tz;
