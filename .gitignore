@@ -53,6 +53,10 @@ ehthumbs.db
 Thumbs.db
 
 # AFL-specific binaries
+afl-g++
+afl-clang
+afl-clang++
+as
 afl-analyze
 afl-as
 afl-gcc
