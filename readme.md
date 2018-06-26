@@ -147,5 +147,5 @@ testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/
 ### Example usage:
 ```
 testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c 50000 -- ./djpeg @@
-testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c F -- ./djpeg @@
+testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -- ./djpeg @@
 ```

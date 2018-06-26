@@ -467,7 +467,7 @@ static void add_instrumentation(void) {
     fputs(use_64bit ? main_payload_64 : main_payload_32, outf);
 
   if (ins_lines && fsrv_only)
-    fputs(just_forkserver_64, outf);
+    fputs(fsrvonly_callback_64, outf);
 
   if (input_file) fclose(inf);
   fclose(outf);
