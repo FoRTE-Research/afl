@@ -117,9 +117,9 @@ static const u8* trampoline_fmt_32 =
   "movl %%ecx,  8(%%esp)\n"
   "movl %%eax, 12(%%esp)\n"
   "movl $0x%08x, %%ecx\n"
-  "nop\nnop\n"
+  "nop\nnop\nnop\n"
   "call __afl_maybe_log\n"
-  "nop\nnop\n"
+  "nop\nnop\nnop\n"
   "movl 12(%%esp), %%eax\n"
   "movl  8(%%esp), %%ecx\n"
   "movl  4(%%esp), %%edx\n"
@@ -724,7 +724,7 @@ static const u8* main_payload_64 =
 static const u8* fsrvonly_callback_64 = 
 
   "\n"
-  "/* --- AFL MAIN PAYLOAD (64-BIT) --- */\n"
+  "/* --- FORKSERVER-ONLY INSTRUMENTATION (64-BIT) --- */\n"
   "\n"
   ".text\n"
   ".att_syntax\n"
