@@ -3,18 +3,18 @@ This repository contains several modified versions of AFL for input collection, 
 **NOTE:** This software is strictly a research prototype. 
 
 ## Table of contents:
-* [Getting Started](#Getting-Started)
-  * [1. Download and install AFL and AFL's QEMU](#1.-Download-and-install-AFL-and-AFL's-QEMU)
-  * [2. Download and install Dyninst, AFL-Dyninst, and UnTracer]
-  * [3. Configure environment variables]
-* [afl-fuzz-saveinputs - modified afl-fuzz for input saving]
-* [testtrace - modified afl-fuzz for trace time evaluation]
-  * [Supported tracing schemes:]
-    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box]
-    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box baseline (forkserver-only)]
-    * [afl-dyninst - static-instrumented black-box]
-    * [UnTracerInst+Dyninst - static-instrumented black-box baseline (forkserver-only)]
-    * [QEMU - dynamic-instrumented black-box]
+* [Getting Started](#getting-started)
+  * [1. Download and install AFL and AFL's QEMU](#1-download-and-install-afl-and-afls-qemu)
+  * [2. Download and install Dyninst, AFL-Dyninst, and UnTracer](#2-download-and-install-dyninst-afl-dyninst-and-untracer)
+  * [3. Configure environment variables](#3-configure-environment-variables)
+* [afl-fuzz-saveinputs - modified afl-fuzz for input saving](#afl-fuzz-saveinputs---modified-afl-fuzz-for-input-saving)
+* [testtrace - modified afl-fuzz for trace time evaluation](#testtrace---modified-afl-fuzz-for-trace-time-evaluation)
+  * [Supported tracing schemes:](#)
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box](#afl-gccgclangclang-compiler-instrumented-white-box)
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box baseline (forkserver-only)](#afl-gccgclangclang-compiler-instrumented-white-box-baseline-forkserver-only)
+    * [afl-dyninst - static-instrumented black-box](#afl-dyninst-static-instrumented-black-box)
+    * [UnTracerInst+Dyninst - static-instrumented black-box baseline (forkserver-only)](#untracerinstdyninst-static-instrumented-black-box-baseline-forkserver-only)
+    * [QEMU - dynamic-instrumented black-box](#qemu-dynamic-instrumented-black-box)
 
 ## Getting Started
 
