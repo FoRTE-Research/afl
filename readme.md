@@ -61,15 +61,14 @@ Syntax:
 afl-fuzz-saveinputs -i [/path/to/seed_dir] -o [/path/to/out_dir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
 Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.  
-
-**Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size.
+ * **Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size.
 
 ## testtrace - modified afl-fuzz for trace time evaluation
 Syntax:
 ```
 testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
 ```
-**Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
+ * **Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
 
 ### Supported tracing schemes:
 
@@ -82,8 +81,7 @@ $ make clean all
 
 #### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box forkserver-only
 Compile target using any of the aforementioned afl compilers, but with additional compiler flag `-Wa,-F`.  
-
-**Note:** assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F` before compiling.
+ * **Note:** assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F` before compiling.
 
 #### [afl-dyninst] static-instrumented black-box
 Instrument target using `afl-dyninst`:
