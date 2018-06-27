@@ -20,11 +20,9 @@ chmod +x ../afl-qemu-trace
 Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
 
 #### 2. Download and install Dyninst, AFL-Dyninst, and UnTracer
-Dyninst: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
-
-AFL-Dyninst: https://github.com/FoRTE-Research/afl-dyninst
-
-UnTracer: https://github.com/FoRTE-Research/untracer
+* Dyninst: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
+* AFL-Dyninst: https://github.com/FoRTE-Research/afl-dyninst
+* UnTracer: https://github.com/FoRTE-Research/untracer
 
 #### 3. Configure environment variables
 ```
@@ -44,39 +42,39 @@ export AFL_DONT_OPTIMIZE=1
 ## afl-fuzz-saveinputs - modified afl-fuzz for input saving
 Syntax:
 ```
-afl-fuzz-saveinputs -i [/path/to/seeddir] -o [/path/to/outdir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
+afl-fuzz-saveinputs -i [/path/to/seed_dir] -o [/path/to/out_dir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
-Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.
-Note: QEMU mode is recommended (otherwise dumps may be explosively large in size).
+Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.  
+**Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size.
 
 ## testtrace - modified afl-fuzz for trace time evaluation
 Syntax:
 ```
 testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
 ```
-Note: only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
+**Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
 
 ### Supported tracing schemes:
 
 #### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box
-Compile target using any of the provided afl compilers:
+Compile target using any of the aforementioned afl compilers:
 ```
 $ CC=/path/to/afl/afl-gcc ./configure --disable-shared
 $ make clean all
 ```
 
 #### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box baseline (forkserver-only)
-Compile target using any of the provided afl compilers, but with additional compiler flag `-Wa,-F`.
-Note: assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F`.
+Compile target using any of the aforementioned afl compilers, but with additional compiler flag `-Wa,-F`.  
+**Note:** assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F` before compiling.
 
 #### [afl-dyninst] static-instrumented black-box
-Instrument target using afl-dyninst:
+Instrument target using `afl-dyninst`:
 ```
 afl-dyninst -i [path/to/target] -o [path/to/instrumented/target] -v
 ```
 
 #### [UnTracerInst+Dyninst] static-instrumented black-box baseline (forkserver-only)
-Instrument target using UnTracerInst:
+Instrument target using `UnTracerInst`:
 ```
 UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
 ```
