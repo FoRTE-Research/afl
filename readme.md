@@ -1,6 +1,7 @@
 # FoRTE-Research's AFL
-This repository contains several modified versions of AFL for input collection, trace speed evaluation, and instrumentation.  
-**NOTE:** This software is strictly a research prototype. 
+This repository contains several modified versions of AFL for input collection, trace speed evaluation, and instrumentation.
+
+**DISCLAIMER:** This software is strictly a research prototype.
 
 ## Table of contents:
 * [Getting Started](#getting-started)
