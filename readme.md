@@ -9,7 +9,7 @@ This repository contains several modified versions of AFL for input collection, 
   * [3. Configure environment variables](#3-configure-environment-variables)
 * [afl-fuzz-saveinputs - modified afl-fuzz for input saving](#afl-fuzz-saveinputs---modified-afl-fuzz-for-input-saving)
 * [testtrace - modified afl-fuzz for trace time evaluation](#testtrace---modified-afl-fuzz-for-trace-time-evaluation)
-  * [Supported tracing schemes:](#)
+  * [Supported tracing schemes:](#supported-tracing-schemes)
     * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box](#afl-gccgclangclang-compiler-instrumented-white-box)
     * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box baseline (forkserver-only)](#afl-gccgclangclang-compiler-instrumented-white-box-baseline-forkserver-only)
     * [afl-dyninst - static-instrumented black-box](#afl-dyninst-static-instrumented-black-box)
