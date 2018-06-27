@@ -1,5 +1,20 @@
 # FoRTE-Research's AFL
-This repository contains several modified versions of AFL.
+This repository contains several modified versions of AFL for input collection, trace speed evaluation, and instrumentation.  
+**NOTE:** This software is strictly a research prototype. 
+
+## Table of contents:
+* [Getting Started](#Getting-Started)
+  * [1. Download and install AFL and AFL's QEMU](#1.-Download-and-install-AFL-and-AFL's-QEMU)
+  * [2. Download and install Dyninst, AFL-Dyninst, and UnTracer]
+  * [3. Configure environment variables]
+* [afl-fuzz-saveinputs - modified afl-fuzz for input saving]
+* [testtrace - modified afl-fuzz for trace time evaluation]
+  * [Supported tracing schemes:]
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box]
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box baseline (forkserver-only)]
+    * [afl-dyninst - static-instrumented black-box]
+    * [UnTracerInst+Dyninst - static-instrumented black-box baseline (forkserver-only)]
+    * [QEMU - dynamic-instrumented black-box]
 
 ## Getting Started
 
