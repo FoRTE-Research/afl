@@ -12,9 +12,9 @@ This repository contains several modified versions of AFL for input collection, 
 * [testtrace - modified afl-fuzz for trace time evaluation](#testtrace---modified-afl-fuzz-for-trace-time-evaluation)
   * [Supported tracing schemes:](#supported-tracing-schemes)
     * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box](#afl-gccgclangclang-compiler-instrumented-white-box)
-    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box baseline (forkserver-only)](#afl-gccgclangclang-compiler-instrumented-white-box-baseline-forkserver-only)
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box forkserver-only](#afl-gccgclangclang-compiler-instrumented-white-box-forkserver-only)
     * [afl-dyninst - static-instrumented black-box](#afl-dyninst-static-instrumented-black-box)
-    * [UnTracerInst+Dyninst - static-instrumented black-box baseline (forkserver-only)](#untracerinstdyninst-static-instrumented-black-box-baseline-forkserver-only)
+    * [UnTracerInst+Dyninst - static-instrumented black-box forkserver-only](#untracerinstdyninst-static-instrumented-black-box-forkserver-only)
     * [QEMU - dynamic-instrumented black-box](#qemu-dynamic-instrumented-black-box)
 
 ## Getting Started
