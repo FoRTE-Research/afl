@@ -61,6 +61,7 @@ Syntax:
 afl-fuzz-saveinputs -i [/path/to/seed_dir] -o [/path/to/out_dir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
 Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.  
+
 **Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size.
 
 ## testtrace - modified afl-fuzz for trace time evaluation
@@ -79,8 +80,9 @@ $ CC=/path/to/afl/afl-gcc ./configure --disable-shared
 $ make clean all
 ```
 
-#### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box baseline (forkserver-only)
+#### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box forkserver-only
 Compile target using any of the aforementioned afl compilers, but with additional compiler flag `-Wa,-F`.  
+
 **Note:** assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F` before compiling.
 
 #### [afl-dyninst] static-instrumented black-box
@@ -89,7 +91,7 @@ Instrument target using `afl-dyninst`:
 afl-dyninst -i [path/to/target] -o [path/to/instrumented/target] -v
 ```
 
-#### [UnTracerInst+Dyninst] static-instrumented black-box baseline (forkserver-only)
+#### [UnTracerInst+Dyninst] static-instrumented black-box forkserver-only
 Instrument target using `UnTracerInst`:
 ```
 UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
