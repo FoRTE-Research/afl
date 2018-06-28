@@ -305,6 +305,8 @@ int main(int argc, char** argv) {
 
     SAYF(cCYA "afl-cc " cBRI VERSION cRST " by <lcamtuf@google.com>\n");
 
+    SAYF(cBRI "NOTE: Ignore any " cBLU "\"invalid option\" " cBRI "assembler errors.\n" cRST);
+
   } else be_quiet = 1;
 
   if (argc < 2) {
@@ -330,6 +332,9 @@ int main(int argc, char** argv) {
   find_as(argv[0]);
 
   edit_params(argc, argv);
+
+  for (int i=0; i<cc_par_cnt; i++)
+    printf("%s\n", cc_params[i]);
 
   execvp(cc_params[0], (char**)cc_params);
 
