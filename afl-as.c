@@ -136,7 +136,7 @@ static void edit_params(int argc, char** argv) {
 
     if (!strcmp(argv[i], "-F")) {
       fsrv_only = 1;
-      SAYF(cBRI "Instrumenting in " cBLU "forkserver-only " cBRI "mode\n" cRST);
+      SAYF(cBRI "Instrumenting in " cBLU "forkserver-only " cBRI "mode...\n" cRST);
       continue;
     }
 
