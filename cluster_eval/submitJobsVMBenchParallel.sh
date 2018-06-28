@@ -1,7 +1,9 @@
 #!/bin/bash
 
-cat bsdtar.sh > benchmark.sh
-cat bsdtar.sh > ../../UnTracer/benchmark.sh
+bench=bsdtar
+
+cat ${bench}.sh > benchmark.sh
+cat ${bench}.sh > ../../UnTracer/benchmark.sh
 
 home=`pwd`
 
@@ -12,14 +14,14 @@ do
     for day in `seq 1 5`
     do
 	export FSF_DAY=$day
-	export FSF_INPUTS_PATH=/media/sf_hugeData/day${FSF_DAY}
+	export FSF_INPUTS_PATH=/media/sf_bigdata_grade10/day${FSF_DAY}
 
 	sh fuzzConBaseline.pbs
-	#    sh fuzzConDyninst.pbs
+	sh fuzzConDyninst.pbs
 	sh fuzzConWB.pbs
 	sh fuzzConQemu.pbs
-	#    cd ../../UnTracer
-	#    sh fuzzConUntracer.pbs
-	#    cd $home
+	cd ../../UnTracer
+	sh fuzzConUntracer.pbs
+	cd $home
     done
 done

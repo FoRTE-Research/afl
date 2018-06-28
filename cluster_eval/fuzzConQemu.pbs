@@ -5,8 +5,8 @@
 
 . ./youEdit.sh
 
-echo ../testtrace -t 100 -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_qemu_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
+echo ../testtrace -t 100 -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ${FSF_RESULT_DIR}/res_${FSF_BENCH}_qemu_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
 
-../testtrace -t 100 -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ./res_${FSF_BENCH}_qemu_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
+../testtrace -t 100 -c $FSF_NUM_INPUTS -i $FSF_DUMP -s $FSF_SIZES -f ${FSF_RESULT_DIR}/res_${FSF_BENCH}_qemu_${FSF_DAY}_$PBS_JOBID.txt -o ./outDIR_$PBS_JOBID -Q -- ./${FSF_BENCH}Original $FSF_BENCH_ARGS
 
 . ./exitCleanup.sh
