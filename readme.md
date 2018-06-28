@@ -1,19 +1,32 @@
 # FoRTE-Research's AFL
+This repository contains several modified versions of AFL for input collection, trace speed evaluation, and instrumentation.
 
-This repository contains several modified versions of AFL.
+**DISCLAIMER:** This software is strictly a research prototype.
+
+## Table of contents:
+* [Getting Started](#getting-started)
+  * [1. Download and install AFL and AFL's QEMU](#1-download-and-install-afl-and-afls-qemu)
+  * [2. Download and install Dyninst, AFL-Dyninst, and UnTracer](#2-download-and-install-dyninst-afl-dyninst-and-untracer)
+  * [3. Configure environment variables](#3-configure-environment-variables)
+* [afl-fuzz-saveinputs - modified afl-fuzz for input saving](#afl-fuzz-saveinputs---modified-afl-fuzz-for-input-saving)
+* [testtrace - modified afl-fuzz for trace time evaluation](#testtrace---modified-afl-fuzz-for-trace-time-evaluation)
+  * [Supported tracing schemes:](#supported-tracing-schemes)
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box](#afl-gccgclangclang-compiler-instrumented-white-box)
+    * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box forkserver-only](#afl-gccgclangclang-compiler-instrumented-white-box-forkserver-only)
+    * [afl-dyninst - static-instrumented black-box](#afl-dyninst-static-instrumented-black-box)
+    * [UnTracerInst+Dyninst - static-instrumented black-box forkserver-only](#untracerinstdyninst-static-instrumented-black-box-forkserver-only)
+    * [QEMU - dynamic-instrumented black-box](#qemu-dynamic-instrumented-black-box)
 
 ## Getting Started
 
-### 1. Download and install AFL
+#### 1. Download and install AFL and AFL's QEMU
+AFL:
 ```
 git clone https://github.com/FoRTE-Research/afl
 cd afl
 make all
 ```
-
-
-### 2. Install QEMU
-
+QEMU:
 ```
 sudo apt-get install libtool-bin libglib2.0-dev automake flex bison
 cd afl/qemu_mode
@@ -22,130 +35,68 @@ chmod +x ../afl-qemu-trace
 ```
 Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
 
+#### 2. Download and install Dyninst, AFL-Dyninst, and UnTracer
+* Dyninst: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
+* AFL-Dyninst: https://github.com/FoRTE-Research/afl-dyninst
+* UnTracer: https://github.com/FoRTE-Research/untracer
 
-
-### 3. Install Dyninst
-See here: https://github.com/FoRTE-Research/UnTracer-Fuzzing#1-installing-dyninst
-
-
-
-### 4. Download AFL-Dyninst and UnTracer
+#### 3. Configure environment variables
 ```
-git clone https://github.com/FoRTE-Research/afl-dyninst
-git clone https://github.com/FoRTE-Research/untracer
-```
-
-
-
-### 5. Configure environment variables
-```
-git clone https://github.com/FoRTE-Research/setup_envs
-cd setup_envs
-```
-
-Edit setup.sh:
-```
-export DYNINST_INSTALL =[/path/to/dyninst/install/dir]
-export AFL_DIR =[/path/to/afl/dir]
-export AFLDYNINST_DIR =[/path/to/afl-dyninst/dir
-export UNTRACER_DIR =[/path/to/untracer/dir]
-```
-
-Run setup.sh:
-```
-. ./setup.sh
+export AFL_PATH=
+export DYNINST_INSTALL=
+export AFLDYNINST_PATH=
+export UNTRACER_PATH=
+export LD_LIBRARY_PATH=$DYNINST_INSTALL/lib:$AFLDYNINST_PATH:$UNTRACER_PATH
+export DYNINSTAPI_RT_LIB=$DYNINST_INSTALL/lib/libdyninstAPI_RT.so
+export PATH=$PATH:$AFL_PATH:$AFLDYNINST_PATH:$UNTRACER_PATH
+export AFL_SKIP_CPUFREQ=1
+export AFL_SKIP_BIN_CHECK=1
+export AFL_DONT_OPTIMIZE=1
 ```
 
 
-
-### 6. Install AFL-Dyninst and UnTracer
-
-Update `DYN_ROOT` in `afl-dyninst/Makefile` to Dyninst's install directory. Then, install AFL-Dyninst
-```
-make clean && make all
-```
-Likewise, update `DYN_ROOT` in `untracer/Makefile` to Dyninst's install directory. Then, install UnTracer:
-```
-make clean && make all
-```
-
-
-## AFL-Fuzz-SaveInputs
+## afl-fuzz-saveinputs - modified afl-fuzz for input saving
 Syntax:
 ```
-afl-fuzz-saveinputs -i [/path/to/seeddir] -o [/path/to/outdir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
+afl-fuzz-saveinputs -i [/path/to/seed_dir] -o [/path/to/out_dir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
-Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.
+Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT_SIZES`, respectively.  
+ * **Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size.
 
-Note that QEMU mode is recommended (otherwise dumps will be explosively large in size).
-
-
-## TestTrace
-Given input data and sizes dumps, `testtrace` will set up the AFL forkserver and shared memory bitmap, and record the trace time for each input found in the provided dump.
-
-Only non-position-independent target binaries are supported. Be sure to compile all target binaries with the `-no-pie` compiler flag.
-
-First, launch the setup_envs script corresponding to the desired target. e.g.:
+## testtrace - modified afl-fuzz for trace time evaluation
+Syntax:
 ```
-. setup_envs/setup_djpeg.sh
+testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
+```
+ * **Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
+
+### Supported tracing schemes:
+
+#### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box
+Compile target using any of the aforementioned afl compilers:
+```
+$ CC=/path/to/afl/afl-gcc ./configure --disable-shared
+$ make clean all
 ```
 
+#### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box forkserver-only
+Compile target using any of the aforementioned afl compilers, but with additional compiler flag `-Wa,-F`.  
+ * **Note:** assigning CFLAG's via commandline will override any default values. You must instead modify the target's `Makefile` to append `-Wa,-F` before compiling.
 
+#### [afl-dyninst] static-instrumented black-box
+Instrument target using `afl-dyninst`:
+```
+afl-dyninst -i [path/to/target] -o [path/to/instrumented/target] -v
+```
 
-### Forkserver-only (baseline) tracing mode
-Instrument the target binary using UnTracerInst's Dyninst-based forkserver-only mode:
+#### [UnTracerInst+Dyninst] static-instrumented black-box forkserver-only
+Instrument target using `UnTracerInst`:
 ```
 UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
 ```
 
-Run as follows:
+#### [QEMU] dynamic-instrumented black-box
+This mode requires no instrumentation. Simply run `testtrace` with the additional `-Q` parameter:
 ```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | leave empty for full dump] -- [/path/to/instrumented/target] [target_args]
-```
-
-
-
-### AFL-GCC tracing mode
-Recompile the target binary using AFL-GCC instrumentation:
-```
-cd /path/to/target/source
-./configure CC="afl-gcc" CXX="afl-g++" --disable-shared
-# edit Makefile to add '-no-pie' to CFLAGS
-make clean
-make
-```
-
-Run as follows:
-```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | leave empty for full dump] -- [/path/to/instrumented/target] [target_args]
-```
-
-
-
-### AFL-Dyninst mode
-Instrument the target binary using AFL-Dyninst:
-```
-afl-dyninst -i [/path/to/target] -o [/path/to/instrumented/target] -v
-```
-
-Run as follows:
-```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | leave empty for full dump] -- [/path/to/instrumented/target] [target_args]
-```
-
-
-
-### AFL-QEMU tracing mode
-
-Skip instrumentation and run with the additional `-Q` directive as follows:
-```
-testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max_execs | leave empty for full dump] -Q -- [/path/to/target] [target_args]
-```
-
-
-
-### Example usage:
-```
-testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c 50000 -- ./djpeg @@
-testtrace -i _ins-dump -s _ins-sizes -f djpeg_out.txt -o djpeg_out -c F -- ./djpeg @@
+testrace [args] -Q -- [/path/to/instrumented/target] [target_args]
 ```

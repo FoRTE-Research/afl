@@ -305,6 +305,8 @@ int main(int argc, char** argv) {
 
     SAYF(cCYA "afl-cc " cBRI VERSION cRST " by <lcamtuf@google.com>\n");
 
+    SAYF(cBRI "NOTE: Ignore any " cBLU "\"invalid option\" " cBRI "assembler errors.\n" cRST);
+
   } else be_quiet = 1;
 
   if (argc < 2) {
@@ -318,7 +320,9 @@ int main(int argc, char** argv) {
          "  CXX=%s/afl-g++ ./configure\n\n"
 
          "You can specify custom next-stage toolchain via AFL_CC, AFL_CXX, and AFL_AS.\n"
-         "Setting AFL_HARDEN enables hardening optimizations in the compiled code.\n\n",
+         "Setting AFL_HARDEN enables hardening optimizations in the compiled code.\n\n"
+
+         "To enable forkserver-only instrumentation mode, use CFLAG \"-Wa,-F\".\n\n",
          BIN_PATH, BIN_PATH);
 
     exit(1);
