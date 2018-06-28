@@ -58,7 +58,7 @@ static u8   be_quiet,           /* Quiet mode (no stderr output)        */
             pass_thru,          /* Just pass data through?              */
             just_version,       /* Just show version?                   */
             sanitizer,          /* Using ASAN / MSAN                    */
-            fsrv_only;          /* Use forkserver-only instrumentation? */
+            fsrv_only=0;          /* Use forkserver-only instrumentation? */
 
 static u32  inst_ratio = 100,   /* Instrumentation probability (%)      */
             as_par_cnt = 1;     /* Number of params to 'as'             */
@@ -88,17 +88,7 @@ static u8   use_64bit = 0;
 static void edit_params(int argc, char** argv) {
 
   u8 *tmp_dir = getenv("TMPDIR"), *afl_as = getenv("AFL_AS");
-  u32 i, j;
-
-  /* Scan argv and remove "-F", if present; we don't want to pass it to as. */
-  for (i = 0; i < argc; i++)
-    if (!strcmp(argv[i], "-F"))
-      break;
-  if (i < argc){
-    argc = argc - 1;
-    for (j = i; j < argc; j++)
-      argv[j] = argv[j + 1];
-  }
+  u32 i;
 
 #ifdef __APPLE__
 
@@ -143,6 +133,11 @@ static void edit_params(int argc, char** argv) {
   as_params[argc] = 0;
 
   for (i = 1; i < argc - 1; i++) {
+
+    if (!strcmp(argv[i], "-F")) {
+      fsrv_only = 1;
+      continue;
+    }
 
     if (!strcmp(argv[i], "--64")) use_64bit = 1;
     else if (!strcmp(argv[i], "--32")) use_64bit = 0;
@@ -495,20 +490,6 @@ int main(int argc, char** argv) {
   u32 rand_seed;
   int status;
   u8* inst_ratio_str = getenv("AFL_INST_RATIO");
-
-  /* By default, we avoid forkserver-only instrumentation. */
-  fsrv_only = 0; 
-
-  /* Scan assembler args ("gcc [gcc-args] -Wa,[as-args]") for "-F". */
-  s32 opt;
-  while ((opt = getopt(argc, argv, "F")) > 0){
-
-    switch (opt) {
-      case 'F':
-        fsrv_only = 1;
-        break;
-    }
-  }
 
   struct timeval tv;
   struct timezone tz;
