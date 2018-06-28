@@ -1828,26 +1828,17 @@ EXP_ST void init_forkserver(char** argv) {
   fsrv_st_fd  = st_pipe[0];
 
   /* Wait for the fork server to come up, but don't wait too long. */
-
-  it.it_value.tv_sec = ((exec_tmout * FORK_WAIT_MULT) / 1000);
-  it.it_value.tv_usec = ((exec_tmout * FORK_WAIT_MULT) % 1000) * 1000;
-
-  setitimer(ITIMER_REAL, &it, NULL);
-
-  rlen = read(fsrv_st_fd, &status, 4);
-
-  it.it_value.tv_sec = 0;
-  it.it_value.tv_usec = 0;
-
-  setitimer(ITIMER_REAL, &it, NULL);
-
-  /* If we have a four-byte "hello" message from the server, we're all set.
-     Otherwise, try to figure out what went wrong. */
-
-  if (rlen == 4) {
-    OKF("All right - fork server is up.");
-    return;
+  int readCounter = 0;
+  while(read(fsrv_st_fd, &status, 4) != 4){
+    readCounter++;
+    if (readCounter == 9999)
+      FATAL("Forkserver not responding...");
+    continue;
   }
+  /* If we have a four-byte "hello" message from the server, we're all set.
+   Otherwise, try to figure out what went wrong. */
+  OKF("All right - fork server is up.");
+  return;
 
   if (child_timed_out)
     FATAL("Timeout while initializing fork server (adjusting -t may help)");
