@@ -368,15 +368,17 @@ static void add_instrumentation(void) {
        branch destination label (handled later on). 
        This is only done in non-forkserver-only mode. */
 
-    if (!fsrv_only && line[0] == '\t') {
+    if (line[0] == '\t') {
 
       if (line[1] == 'j' && line[2] != 'm' && R(100) < inst_ratio) {
 
-        fprintf(outf, use_64bit ? trampoline_fmt_64 : trampoline_fmt_32,
-                R(MAP_SIZE));
+        if(!fsrv_only) {
+	  fprintf(outf, use_64bit ? trampoline_fmt_64 : trampoline_fmt_32,
+		  R(MAP_SIZE));
 
-        ins_lines++;
-
+	  ins_lines++;
+	}
+	
       }
 
       continue;
@@ -436,9 +438,10 @@ static void add_instrumentation(void) {
              
              In forkserver-only mode, we want both conditions to be 0. */ 
 
-          if (fsrv_only && !skip_next_label) instrument_next = 0; 
-          if (!fsrv_only && !skip_next_label) instrument_next = 1; 
-          else skip_next_label = 0;
+          if (!skip_next_label)
+	    instrument_next = fsrv_only ? 0 : 1; 
+          else
+	    skip_next_label = 0;
         }
 
       } else {
@@ -446,9 +449,12 @@ static void add_instrumentation(void) {
         /* Function label (always instrumented, deferred mode). 
            In forkserver-only mode, we only instrument <main>. */
 
-        if (fsrv_only){
-          if (strstr(line, "main:") != NULL) instrument_next = 1;   
-          else instrument_next = 0;
+        if (fsrv_only) {
+	  u8 * matchAddress = strstr(line, "main:");
+          if (matchAddress != NULL && (matchAddress == line || isspace( *(matchAddress - 1) ) ))
+	    instrument_next = 1;   
+          else
+	    instrument_next = 0;
         }
         else 
           instrument_next = 1;
@@ -458,13 +464,10 @@ static void add_instrumentation(void) {
     }
 
   }
-
-  if (ins_lines && !fsrv_only)
-    fputs(use_64bit ? main_payload_64 : main_payload_32, outf);
-
-  if (ins_lines && fsrv_only)
-    fputs(fsrvonly_callback_64, outf);
-
+  
+  if (ins_lines)
+    fputs(fsrv_only ? fsrvonly_callback_64 : use_64bit ? main_payload_64 : main_payload_32, outf);
+    
   if (input_file) fclose(inf);
   fclose(outf);
 
