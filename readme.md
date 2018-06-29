@@ -75,7 +75,7 @@ testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/
 #### [afl-gcc/g++/clang/clang++] compiler-instrumented white-box
 Compile target using any of the aforementioned afl compilers:
 ```
-$ CC=/path/to/afl/afl-gcc ./configure --disable-shared
+$ CC=/path/to/afl/afl-gcc|afl-clang CXX=/path/to/afl-g++|afl-clang++ ./configure --disable-shared
 $ make clean all
 ```
 
