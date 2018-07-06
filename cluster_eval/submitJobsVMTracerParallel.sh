@@ -1,83 +1,25 @@
-export PBS_JOBID=1
+#!/bin/bash
 
 home=`pwd`
 
-cat bsdtar.sh > benchmark.sh
-cat bsdtar.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
+for day in `seq 1 5`
+do
+    export FSF_DAY=$day
+    export FSF_INPUTS_PATH=/media/sf_bigdata/day${FSF_DAY}
+    export PBS_JOBID=1
 
-cat cert-basic.sh > benchmark.sh
-cat cert-basic.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
+    for bench in bsdtar cert-basic cjson djpeg pdftohtml readelf sfconvert tcpdump
+    do
+	
+	cat ${bench}.sh > benchmark.sh
+	cat ${bench}.sh > ../../UnTracer/benchmark.sh
 
-cat cjson.sh > benchmark.sh
-cat cjson.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
-
-cat djpeg.sh > benchmark.sh
-cat djpeg.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
-
-cat pdftohtml.sh > benchmark.sh
-cat pdftohtml.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
-
-cat readelf.sh > benchmark.sh
-cat readelf.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
-
-cat sfconvert.sh > benchmark.sh
-cat sfconvert.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
-
-cat tcpdump.sh > benchmark.sh
-cat tcpdump.sh > ../../UnTracer/benchmark.sh
-sh fuzzConBaseline.pbs
-sh fuzzConDyninst.pbs
-sh fuzzConWB.pbs
-sh fuzzConQemu.pbs
-cd ../../UnTracer
-sh fuzzConUntracer.pbs
-cd $home
+	sh fuzzConBaseline.pbs
+	sh fuzzConDyninst.pbs
+	sh fuzzConWB.pbs
+	sh fuzzConQemu.pbs
+	#cd ../../UnTracer
+	#sh fuzzConUntracer.pbs
+	#cd $home
+    done
+done
