@@ -14,7 +14,7 @@ This repository contains several modified versions of AFL for input collection, 
     * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box](#afl-gccgclangclang-compiler-instrumented-white-box)
     * [afl-gcc/g++/clang/clang++ - compiler-instrumented white-box forkserver-only](#afl-gccgclangclang-compiler-instrumented-white-box-forkserver-only)
     * [afl-dyninst - static-instrumented black-box](#afl-dyninst-static-instrumented-black-box)
-    * [UnTracerInst+Dyninst - static-instrumented black-box forkserver-only](#untracerinstdyninst-static-instrumented-black-box-forkserver-only)
+    * [UnTracerDyninst - static-instrumented black-box forkserver-only](#untracerdyninst-static-instrumented-black-box-forkserver-only)
     * [QEMU - dynamic-instrumented black-box](#qemu-dynamic-instrumented-black-box)
 
 ## Getting Started
@@ -89,10 +89,10 @@ Instrument target using `afl-dyninst`:
 afl-dyninst -i [path/to/target] -o [path/to/instrumented/target] -v
 ```
 
-#### [UnTracerInst+Dyninst] static-instrumented black-box forkserver-only
-Instrument target using `UnTracerInst`:
+#### [UnTracerDyninst] static-instrumented black-box forkserver-only
+Instrument target using `UnTracerDyninst`:
 ```
-UnTracerInst -i [path/to/target] -o [path/to/instrumented/target] -f -v
+UnTracerDyninst -i [path/to/target] -o [path/to/instrumented/target] -f -v
 ```
 
 #### [QEMU] dynamic-instrumented black-box
