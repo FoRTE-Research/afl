@@ -1,0 +1,13 @@
+--- qemu-2.10.0-rc3-clean/util/memfd.c	2018-09-26 13:18:23.134362294 -0700
++++ qemu-2.10.0-rc3/util/memfd.c	2018-09-26 13:19:02.218288620 -0700
+@@ -31,9 +31,7 @@
+ 
+ #include "qemu/memfd.h"
+ 
+-#ifdef CONFIG_MEMFD
+-#include <sys/memfd.h>
+-#elif defined CONFIG_LINUX
++#if defined CONFIG_LINUX && !defined CONFIG_MEMFD
+ #include <sys/syscall.h>
+ #include <asm/unistd.h>
+ 

@@ -72,6 +72,7 @@
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
 
+
 EXP_ST u8 *in_dir,                    /* Input directory with test cases  */
           *out_file,                  /* File to fuzz, if any             */
           *out_dir,                   /* Working & output directory       */
@@ -7953,11 +7954,6 @@ int main(int argc, char** argv) {
     use_argv = get_qemu_argv(argv[0], argv + optind, argc - optind);
   else
     use_argv = argv + optind;
-
-  for (int i=0; i<argc; i++){
-    printf("%s\n", use_argv[i]);
-  }
-  exit(0);
 
   perform_dry_run(use_argv);
 
