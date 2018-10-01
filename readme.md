@@ -7,7 +7,7 @@ This repository contains several modified versions of AFL components which we ut
 * [Installation](#installation)
 * [afl-fuzz-saveinputs](#afl-fuzz-saveinputs)
 * [testtrace](#testtrace)
-* [FoRTE-afl-cc](#FoRTE-afl-cc)
+* [FoRTE-afl-cc](#forte-afl-cc)
 
 #### Installation
 AFL:
