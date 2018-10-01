@@ -9,7 +9,7 @@ This repository contains several modified versions of AFL components which we ut
 * [testtrace](#testtrace)
 * [FoRTE-afl-cc](#forte-afl-cc)
 
-#### Installation
+## Installation
 AFL:
 ```
 git clone https://github.com/FoRTE-Research/afl
