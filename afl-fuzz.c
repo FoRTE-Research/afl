@@ -172,6 +172,7 @@ EXP_ST u64 total_crashes,             /* Total number of crashes          */
            queue_cycle,               /* Queue round counter              */
            cycles_wo_finds,           /* Cycles without any new paths     */
            trim_execs,                /* Execs done to trim input files   */
+           calib_execs,               // stefan
            bytes_trim_in,             /* Bytes coming into the trimmer    */
            bytes_trim_out,            /* Bytes coming outa the trimmer    */
            blocks_eff_total,          /* Blocks subject to effector maps  */
@@ -2563,6 +2564,8 @@ static u8 calibrate_case(char** argv, struct queue_entry* q, u8* use_mem,
     write_to_testcase(use_mem, q->len);
 
     fault = run_target(argv, use_tmout);
+    
+    calib_execs++; // stefan
 
     /* stop_soon is set by the handler for Ctrl+C. When it's pressed,
        we want to bail out quickly. */
@@ -3168,6 +3171,8 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
 
       total_tmouts++;
 
+      if (!getenv("UNTRACER_HANG_TMOUT")) return keeping;
+
       if (unique_hangs >= KEEP_UNIQUE_HANG) return keeping;
 
       if (!dumb_mode) {
@@ -3397,6 +3402,8 @@ static void write_stats_file(double bitmap_cvg, double stability, double eps) {
              "fuzzer_pid        : %u\n"
              "cycles_done       : %llu\n"
              "execs_done        : %llu\n"
+             "calib_execs       : %llu\n"
+             "trim_execs        : %llu\n"
              "execs_per_sec     : %0.02f\n"
              "paths_total       : %u\n"
              "paths_favored     : %u\n"
@@ -3411,6 +3418,7 @@ static void write_stats_file(double bitmap_cvg, double stability, double eps) {
              "bitmap_cvg        : %0.02f%%\n"
              "unique_crashes    : %llu\n"
              "unique_hangs      : %llu\n"
+             "total_tmouts      : %llu\n"
              "last_path         : %llu\n"
              "last_crash        : %llu\n"
              "last_hang         : %llu\n"
@@ -3421,11 +3429,11 @@ static void write_stats_file(double bitmap_cvg, double stability, double eps) {
              "target_mode       : %s%s%s%s%s%s%s\n"
              "command_line      : %s\n",
              start_time / 1000, get_cur_time() / 1000, getpid(),
-             queue_cycle ? (queue_cycle - 1) : 0, total_execs, eps,
+             queue_cycle ? (queue_cycle - 1) : 0, total_execs, calib_execs, trim_execs, eps,
              queued_paths, queued_favored, queued_discovered, queued_imported,
              max_depth, current_entry, pending_favored, pending_not_fuzzed,
              queued_variable, stability, bitmap_cvg, unique_crashes,
-             unique_hangs, last_path_time / 1000, last_crash_time / 1000,
+             unique_hangs, total_tmouts, last_path_time / 1000, last_crash_time / 1000,
              last_hang_time / 1000, total_execs - last_crash_execs,
              exec_tmout, use_banner,
              qemu_mode ? "qemu " : "", dumb_mode ? " dumb " : "",
@@ -3468,10 +3476,10 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps) {
      execs_per_sec */
 
   fprintf(plot_file, 
-          "%llu, %llu, %u, %u, %u, %u, %0.02f%%, %llu, %llu, %u, %0.02f\n",
+          "%llu, %llu, %u, %u, %u, %u, %0.02f%%, %llu, %llu, %llu, %u, %0.02f, %llu, %llu, %llu\n",
           get_cur_time() / 1000, queue_cycle - 1, current_entry, queued_paths,
           pending_not_fuzzed, pending_favored, bitmap_cvg, unique_crashes,
-          unique_hangs, max_depth, eps); /* ignore errors */
+          unique_hangs, total_tmouts, max_depth, eps, total_execs, calib_execs, trim_execs); /* ignore errors */
 
   fflush(plot_file);
 
@@ -4170,9 +4178,19 @@ static void show_stats(void) {
 
   SAYF (bSTG bV bSTOP "  total tmouts : " cRST "%-22s " bSTG bV "\n", tmp);
 
+
+  // stefan
+  SAYF(bVR cCYA bSTOP " additional stats " bSTG bH20 bH10 bH20 bH10 bVL "\n");
+    
+  sprintf(tmp, "%s (%0.02f%%)", DI(calib_execs), ((double)calib_execs) * 100 / total_execs);
+  SAYF(bV bSTOP " calib execs : %s%-21s" bSTG, cRST, tmp);
+
+  sprintf(tmp, "%s (%0.02f%%)", DI(trim_execs), ((double)trim_execs) * 100 / total_execs);
+  SAYF(bSTOP "     trim execs  : " cRST "%-21s  " bSTG bV "\n", tmp);
+
   /* Aaaalmost there... hold on! */
 
-  SAYF(bVR bH cCYA bSTOP " fuzzing strategy yields " bSTG bH10 bH bHT bH10
+  SAYF(bVR bH cCYA bSTOP " fuzzing strategy yields " bSTG bH10 bH bH bH10
        bH5 bHB bH bSTOP cCYA " path geometry " bSTG bH5 bH2 bH bVL "\n");
 
   if (skip_deterministic) {
@@ -7173,7 +7191,7 @@ EXP_ST void setup_dirs_fds(void) {
 
   fprintf(plot_file, "# unix_time, cycles_done, cur_path, paths_total, "
                      "pending_total, pending_favs, map_size, unique_crashes, "
-                     "unique_hangs, max_depth, execs_per_sec\n");
+                     "unique_hangs, total_tmouts, max_depth, execs_per_sec, execs_done, calib_execs, trim_execs\n");
                      /* ignore errors */
 
 }

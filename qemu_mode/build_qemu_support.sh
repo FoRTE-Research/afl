@@ -89,31 +89,31 @@ ARCHIVE="`basename -- "$QEMU_URL"`"
 
 CKSUM=`sha384sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
 
-if [ ! "$CKSUM" = "$QEMU_SHA384" ]; then
+#if [ ! "$CKSUM" = "$QEMU_SHA384" ]; then
 
-  echo "[*] Downloading QEMU ${VERSION} from the web..."
-  rm -f "$ARCHIVE"
-  wget -O "$ARCHIVE" -- "$QEMU_URL" || exit 1
+#  echo "[*] Downloading QEMU ${VERSION} from the web..."
+#  rm -f "$ARCHIVE"
+#  wget -O "$ARCHIVE" -- "$QEMU_URL" || exit 1
 
-  CKSUM=`sha384sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
+#  CKSUM=`sha384sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
 
-fi
+#fi
 
-if [ "$CKSUM" = "$QEMU_SHA384" ]; then
+#if [ "$CKSUM" = "$QEMU_SHA384" ]; then
 
-  echo "[+] Cryptographic signature on $ARCHIVE checks out."
+#  echo "[+] Cryptographic signature on $ARCHIVE checks out."
 
-else
+#else
 
-  echo "[-] Error: signature mismatch on $ARCHIVE (perhaps download error?)."
-  exit 1
+#  echo "[-] Error: signature mismatch on $ARCHIVE (perhaps download error?)."
+#  exit 1
 
-fi
+#fi
 
 echo "[*] Uncompressing archive (this will take a while)..."
 
-rm -rf "qemu-${VERSION}" || exit 1
-tar xf "$ARCHIVE" || exit 1
+#rm -rf "qemu-${VERSION}" || exit 1
+#tar xf "$ARCHIVE" || exit 1
 
 echo "[+] Unpacking successful."
 
