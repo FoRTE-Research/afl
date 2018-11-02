@@ -72,6 +72,15 @@
 /* Lots of globals, but mostly for the status UI and other things where it
    really makes no sense to haul them around as function parameters. */
 
+unsigned long time_start;
+unsigned long time_total;
+
+unsigned long time_trace;
+unsigned long time_crash;
+unsigned long time_queue;
+unsigned long time_calib_trace;
+unsigned long time_trim_trace;
+
 
 EXP_ST u8 *in_dir,                    /* Input directory with test cases  */
           *out_file,                  /* File to fuzz, if any             */
@@ -2563,8 +2572,11 @@ static u8 calibrate_case(char** argv, struct queue_entry* q, u8* use_mem,
 
     write_to_testcase(use_mem, q->len);
 
+    unsigned long time_calib_trace_tmp = get_cur_time_us();
     fault = run_target(argv, use_tmout);
-    
+    time_calib_trace += get_cur_time_us() - time_calib_trace_tmp;
+ 
+
     calib_execs++; // stefan
 
     /* stop_soon is set by the handler for Ctrl+C. When it's pressed,
@@ -3113,13 +3125,21 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
   s32 fd;
   u8  keeping = 0, res;
 
+  unsigned long time_crash_tmp;
+
   if (fault == crash_mode) {
+
+    unsigned long time_queue_tmp = get_cur_time_us();
 
     /* Keep only if there are new bits in the map, add to queue for
        future fuzzing, etc. */
 
     if (!(hnb = has_new_bits(virgin_bits))) {
+
       if (crash_mode) total_crashes++;
+
+      time_queue += get_cur_time_us() - time_queue_tmp;
+
       return 0;
     }    
 
@@ -3157,6 +3177,8 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
     close(fd);
 
     keeping = 1;
+
+    time_queue += get_cur_time_us() - time_queue_tmp;
 
   }
 
@@ -3231,13 +3253,20 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
 
 keep_as_crash:
 
+      time_crash_tmp = get_cur_time_us();
+
       /* This is handled in a manner roughly similar to timeouts,
          except for slightly different limits and no need to re-run test
          cases. */
 
       total_crashes++;
 
-      if (unique_crashes >= KEEP_UNIQUE_CRASH) return keeping;
+      if (unique_crashes >= KEEP_UNIQUE_CRASH) {
+
+        time_crash += get_cur_time_us() - time_crash_tmp;
+
+        return keeping;
+      }
 
       if (!dumb_mode) {
 
@@ -3247,7 +3276,12 @@ keep_as_crash:
         simplify_trace((u32*)trace_bits);
 #endif /* ^__x86_64__ */
 
-        if (!has_new_bits(virgin_crash)) return keeping;
+        if (!has_new_bits(virgin_crash)) {
+
+          time_crash += get_cur_time_us() - time_crash_tmp;
+
+          return keeping;
+        }
 
       }
 
@@ -3269,6 +3303,8 @@ keep_as_crash:
 
       last_crash_time = get_cur_time();
       last_crash_execs = total_execs;
+
+      time_crash += get_cur_time_us() - time_crash_tmp;
 
       break;
 
@@ -3419,6 +3455,13 @@ static void write_stats_file(double bitmap_cvg, double stability, double eps) {
              "unique_crashes    : %llu\n"
              "unique_hangs      : %llu\n"
              "total_tmouts      : %llu\n"
+
+             "time_trace        : %0.02f%%\n"
+             "time_queue        : %0.02f%%\n"
+             "time_crash        : %0.02f%%\n"
+             "time_calib_trace  : %0.02f%%\n"
+             "time_trim_trace   : %0.02f%%\n"
+
              "last_path         : %llu\n"
              "last_crash        : %llu\n"
              "last_hang         : %llu\n"
@@ -3433,7 +3476,15 @@ static void write_stats_file(double bitmap_cvg, double stability, double eps) {
              queued_paths, queued_favored, queued_discovered, queued_imported,
              max_depth, current_entry, pending_favored, pending_not_fuzzed,
              queued_variable, stability, bitmap_cvg, unique_crashes,
-             unique_hangs, total_tmouts, last_path_time / 1000, last_crash_time / 1000,
+             unique_hangs, total_tmouts, 
+
+             ((double)time_trace * 100 / time_total),
+             ((double)time_queue * 100 / time_total),
+             ((double)time_crash * 100 / time_total),
+             ((double)time_calib_trace * 100 / time_total),
+             ((double)time_trim_trace * 100 / time_total),
+
+             last_path_time / 1000, last_crash_time / 1000,
              last_hang_time / 1000, total_execs - last_crash_execs,
              exec_tmout, use_banner,
              qemu_mode ? "qemu " : "", dumb_mode ? " dumb " : "",
@@ -3476,10 +3527,18 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps) {
      execs_per_sec */
 
   fprintf(plot_file, 
-          "%llu, %llu, %u, %u, %u, %u, %0.02f%%, %llu, %llu, %llu, %u, %0.02f, %llu, %llu, %llu\n",
+          "%llu, %llu, %u, %u, %u, %u, %0.02f%%, %llu, %llu, %llu, %u, %0.02f, %llu, %llu, %llu, %0.02f%%, %0.02f%%, %0.02f%%, %0.02f%%, %0.02f%% \n",
           get_cur_time() / 1000, queue_cycle - 1, current_entry, queued_paths,
           pending_not_fuzzed, pending_favored, bitmap_cvg, unique_crashes,
-          unique_hangs, total_tmouts, max_depth, eps, total_execs, calib_execs, trim_execs); /* ignore errors */
+          unique_hangs, total_tmouts, max_depth, eps, total_execs, calib_execs, trim_execs,
+
+          ((double)time_trace * 100 / time_total),
+          ((double)time_queue * 100 / time_total),
+          ((double)time_crash * 100 / time_total),
+          ((double)time_calib_trace * 100 / time_total),
+          ((double)time_trim_trace * 100 / time_total)
+
+          ); /* ignore errors */
 
   fflush(plot_file);
 
@@ -3865,6 +3924,8 @@ static void check_term_size(void);
 
 static void show_stats(void) {
 
+  time_total = get_cur_time_us() - time_start;
+
   static u64 last_stats_ms, last_plot_ms, last_ms, last_execs;
   static double avg_exec;
   double t_byte_ratio, stab_ratio;
@@ -4188,6 +4249,23 @@ static void show_stats(void) {
   sprintf(tmp, "%s (%0.02f%%)", DI(trim_execs), ((double)trim_execs) * 100 / total_execs);
   SAYF(bSTOP "     trim execs  : " cRST "%-21s  " bSTG bV "\n", tmp);
 
+
+
+
+  SAYF(bVR cCYA bSTOP " timing stats " bSTG bH20 bH2 bH2 bH10 bH20 bH10 bVL "\n");
+    
+  sprintf(tmp, "%0.02f%%", ((double)time_trace) * 100 / time_total);
+  SAYF(bV bSTOP "        trace : %s%-9s" bSTG, cRST, tmp);
+  sprintf(tmp, "%0.02f%%", ((double)time_queue) * 100 / time_total);
+  SAYF(bSTOP "         queue : %s%-9s" bSTG, cRST, tmp);
+  sprintf(tmp, "%0.02f%%", ((double)time_crash) * 100 / time_total);
+  SAYF(bSTOP "           crash : " cRST "%-7s " bSTG bV "\n", tmp);
+
+  sprintf(tmp, "%0.02f%%", ((double)time_calib_trace) * 100 / time_total);
+  SAYF(bV bSTOP "  calib trace : %s%-21s" bSTG, cRST, tmp);
+  sprintf(tmp, "%0.02f%%", ((double)time_trim_trace) * 100 / time_total);
+  SAYF(bSTOP "     trim trace : " cRST "%-22s " bSTG bV "\n", tmp);
+
   /* Aaaalmost there... hold on! */
 
   SAYF(bVR bH cCYA bSTOP " fuzzing strategy yields " bSTG bH10 bH bH bH10
@@ -4509,7 +4587,9 @@ static u8 trim_case(char** argv, struct queue_entry* q, u8* in_buf) {
 
       write_with_gap(in_buf, q->len, remove_pos, trim_avail);
 
+      unsigned long time_trim_trace_tmp = get_cur_time_us(); 
       fault = run_target(argv, exec_tmout);
+      time_trim_trace += get_cur_time_us() - time_trim_trace_tmp;
       trim_execs++;
 
       if (stop_soon || fault == FAULT_ERROR) goto abort_trimming;
@@ -4602,7 +4682,9 @@ EXP_ST u8 common_fuzz_stuff(char** argv, u8* out_buf, u32 len) {
 
   write_to_testcase(out_buf, len);
 
+  unsigned long time_trace_tmp = get_cur_time_us();
   fault = run_target(argv, exec_tmout);
+  time_trace += get_cur_time_us() - time_trace_tmp;
 
   if (stop_soon) return 1;
 
@@ -6723,7 +6805,9 @@ static void sync_fuzzers(char** argv) {
 
         write_to_testcase(mem, st.st_size);
 
+        unsigned long time_trace_tmp = get_cur_time_us();
         fault = run_target(argv, exec_tmout);
+        time_trace += get_cur_time_us() - time_trace_tmp;
 
         if (stop_soon) return;
 
@@ -7191,7 +7275,8 @@ EXP_ST void setup_dirs_fds(void) {
 
   fprintf(plot_file, "# unix_time, cycles_done, cur_path, paths_total, "
                      "pending_total, pending_favs, map_size, unique_crashes, "
-                     "unique_hangs, total_tmouts, max_depth, execs_per_sec, execs_done, calib_execs, trim_execs\n");
+                     "unique_hangs, total_tmouts, max_depth, execs_per_sec, execs_done, calib_execs, trim_execs, "
+                     "time_trace, time_queue, time_crash, time_calib_trace, time_trim_trace\n");
                      /* ignore errors */
 
 }
@@ -7967,6 +8052,8 @@ int main(int argc, char** argv) {
   check_binary(argv[optind]);
 
   start_time = get_cur_time();
+
+  time_start = get_cur_time_us();
 
   if (qemu_mode)
     use_argv = get_qemu_argv(argv[0], argv + optind, argc - optind);
