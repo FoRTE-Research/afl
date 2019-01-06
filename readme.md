@@ -49,7 +49,7 @@ testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/
  * **Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
 
 
-## FoRTE-afl-cc
+## afl-cc forkserver-only extension
 We extend afl-cc's assembly-time instrumentation with a forkserver-only instrumentation mode for use in fuzzing performance experiments. 
 
 To invoke this mode, simply append `-Wa,-F` to your afl-cc compiler flags and compile as usual.
