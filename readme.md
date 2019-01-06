@@ -47,7 +47,7 @@ Syntax:`
 ```
 testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
 ```
- * **Note:** only non-position-independent target binaries are supported. Compile all target binaries with the `-no-pie` compiler flag.
+ * **Note:** only non-position-independent target binaries are supported. Be sure to compile all target binaries with the `-no-pie` compiler flag (unnecessary for Clang).
  
 ## afl-cc forkserver-only extension
 We extend afl-cc's assembly-time instrumentation with a forkserver-only instrumentation mode for use in fuzzing performance experiments. 
