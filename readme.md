@@ -15,7 +15,7 @@ This repository contains several modified versions of AFL components which we ut
 ## INSTALLATION
 #### 1. Download and build AFL:
 ```
-git clone https://github.com/FoRTE-Research/afl
+git clone https://github.com/FoRTE-Research/afl-fid
 cd afl
 make all
 ```
@@ -23,7 +23,7 @@ make all
 #### 2. (optional) Build AFL's QEMU-mode tracing:
 ```
 sudo apt-get install libtool-bin libglib2.0-dev automake flex bison
-cd afl/qemu_mode
+cd afl-fid/qemu_mode
 sudo ./build_qemu_support.sh
 chmod +x ../afl-qemu-trace
 ```
