@@ -1,6 +1,6 @@
 MIT License
 
-Much of afl-fid is adapted from Michal Zalewski's AFL.
+afl-fid is adapted from Michal Zalewski's AFL.
 
 Copyright (c) 2019 Virginia Polytechnic Institute and State University
 
