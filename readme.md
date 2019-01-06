@@ -27,13 +27,11 @@ cd afl/qemu_mode
 sudo ./build_qemu_support.sh
 chmod +x ../afl-qemu-trace
 ```
-Note that the build may finish with an error even though `afl-qemu-trace` was built correctly.  Read a few build status message back in the log to determine if the build was successful.
+Note that the build may finish with an error even though `afl-qemu-trace` was built correctly. We recommend checking a few build status messages in the log to determine if the build was successful.
 
 
 ## afl-fuzz-saveinputs
-afl-fuzz-saveinputs is a modified version of afl-fuzz for dumping generated inputs to file.
-
-Syntax:
+`afl-fuzz-saveinputs` is a modified version of `afl-fuzz` for dumping generated inputs to file. Usage is as follows:
 ```
 afl-fuzz-saveinputs -i [/path/to/seed_dir] -o [/path/to/out_dir] -e [time budget (# minutes)] [optional_args] -Q -- [/path/to/target] [target_args]
 ```
@@ -41,20 +39,14 @@ Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT
  * **Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size (depending on fuzzing speed).
 
 ## testtrace
-testtrace is another afl-fuzz modification for logging each fuzzed input's tracing time. Given an input dump and corresponding sizes file produced by afl-fuzz-saveinputs, `testtrace` recreates each input and logs its execution (function `run_target()`) time. 
-
-Syntax:`
+`testtrace` is an `afl-fuzz` modification for logging each fuzzed input's tracing time. Given an input dump and corresponding sizes file (produced by `afl-fuzz-saveinputs`), `testtrace` recreates each input and logs its execution (function `run_target()` in `afl-fuzz`) time. Usage is as follows:
 ```
 testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
 ```
  * **Note:** only non-position-independent target binaries are supported. Be sure to compile all target binaries with the `-no-pie` compiler flag (unnecessary for Clang).
  
 ## afl-cc forkserver-only extension
-We extend afl-cc's assembly-time instrumentation with a forkserver-only instrumentation mode for use in fuzzing performance experiments. 
-
-To invoke this mode, simply append `-Wa,-F` to your afl-cc compiler flags and compile as usual.
-
-Example:
+We extend the `afl-cc` assembly-time instrumentation with a forkserver-only instrumentation mode for use in benchmarking experiments. To invoke this mode, simply append `-Wa,-F` to your `afl-cc` (e.g., `afl-gcc`, `afl-clang`) compiler flags and compile as usual. Example:
 ```
 ./configure --disable-shared CC=afl-clang CXX=afl-clang++ CFLAGS="-g -O2 -no-pie -Wa,F" CXXFLAGS="-g -O2 -no-pie -Wa,-F"
 make all
