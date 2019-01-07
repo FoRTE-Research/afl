@@ -1,3 +1,11 @@
+|             |                |
+|-------------|----------------|
+|**AUTHOR:**  | Stefan Nagy  |
+|**EMAIL:**   | snagy2@vt.edu |
+|**LICENSE:** | [MIT License](LICENSE) |
+|**DISCLAIMER:**   | This software is strictly a research prototype. |
+
+
 # FoRTE-Research's AFL for Fixed Input Datasets
 
 This repository contains several modified versions of AFL components which we utilize in our experiments: 
@@ -6,13 +14,6 @@ This repository contains several modified versions of AFL components which we ut
 * **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
 
 **Presented in our paper** *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* (appearing in IEEE S&P 2019).
-
-|             |                |
-|-------------|----------------|
-|**AUTHOR:**  | Stefan Nagy  |
-|**EMAIL:**   | snagy2@vt.edu |
-|**LICENSE:** | [MIT License](LICENSE) |
-|**DISCLAIMER:**   | This software is strictly a research prototype. |
 
 ### Citing this repository:
 ```
