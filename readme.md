@@ -5,6 +5,8 @@ This repository contains several modified versions of AFL components which we ut
 * **testtrace** - evaluate any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset
 * **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
 
+**Presented in our paper** *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* (appearing in IEEE S&P 2019).
+
 |             |                |
 |-------------|----------------|
 |**AUTHOR:**  | Stefan Nagy  |
@@ -12,9 +14,7 @@ This repository contains several modified versions of AFL components which we ut
 |**LICENSE:** | [MIT License](LICENSE) |
 |**DISCLAIMER:**   | This software is strictly a research prototype. |
 
-**Presented in our paper** *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* (appearing in IEEE S&P 2019).
-
-**Citing this repository:**
+## CITING THIS REPOSITORY
 ```
 @inproceedings {nagy:fullspeedfuzzing,
   author = {Stefan Nagy and Matthew Hicks},
