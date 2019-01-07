@@ -1,8 +1,13 @@
 # FoRTE-Research's AFL for Fixed Input Datasets
-This repository contains several modified versions of AFL components which we utilize in our experiments (see *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* for more info). 
+This repository contains several modified versions of AFL components which we utilize in our experiments (as presented in our paper *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)*). 
 * **afl-fuzz-saveinputs** - dumps AFL-generated inputs and their sizes to file (for fixed input dataset experiments)
 * **testtrace** - evaluate any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset
 * **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
+
+|             |
+|-------------|
+|**How to Cite:**  |
+
 
 |             |                |
 |-------------|----------------|
