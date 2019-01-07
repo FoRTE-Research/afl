@@ -72,6 +72,6 @@ We extend the `afl-cc` assembly-time instrumentation with a forkserver-only inst
 make all
 ```
 
-##
+#
 <p align=center> <a href="https://www.cs.vt.edu"><img border="0" src="http://people.cs.vt.edu/snagy2/img/vt_inline_computer_science.png" width="60%" height="60%">
 </a> </p>
