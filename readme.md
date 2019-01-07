@@ -1,11 +1,10 @@
 |             |                |
 |-------------|----------------|
+|**TITLE:**   | FoRTE-Research's AFL for Fixed Input Datasets |
 |**AUTHOR:**  | Stefan Nagy  |
 |**EMAIL:**   | snagy2@vt.edu |
 |**LICENSE:** | [MIT License](LICENSE) |
 |**DISCLAIMER:**   | This software is strictly a research prototype. |
-
-# FoRTE-Research's AFL for Fixed Input Datasets
 
 This repository contains several modified versions of AFL components which we utilize in our experiments: 
 * **afl-fuzz-saveinputs** - dumps AFL-generated inputs and their sizes to file (for fixed input dataset experiments)
