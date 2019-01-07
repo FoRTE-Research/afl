@@ -1,13 +1,16 @@
 # FoRTE-Research's AFL for Fixed Input Datasets
-This repository contains several modified versions of AFL components which we utilize in our experiments (as presented in our paper *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)*). 
-* **afl-fuzz-saveinputs** - dumps AFL-generated inputs and their sizes to file (for fixed input dataset experiments)
-* **testtrace** - evaluate any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset
-* **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
+**Presented in our paper** *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* (appearing in IEEE S&P 2019).
 
-|             |
-|-------------|
-|**How to Cite:**  |
-
+***Citing this repository:**
+```
+@inproceedings {nagy:fullspeedfuzzing,
+  author = {Stefan Nagy and Matthew Hicks},
+  title = {{Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing},
+  booktitle = {40th {IEEE} Symposium on Security and Privacy (S&P},
+  month = {May}
+  year = {2019},
+}
+```
 
 |             |                |
 |-------------|----------------|
@@ -15,6 +18,11 @@ This repository contains several modified versions of AFL components which we ut
 |**EMAIL:**   | snagy2@vt.edu |
 |**LICENSE:** | [MIT License](LICENSE) |
 |**DISCLAIMER:**   | This software is strictly a research prototype. |
+
+This repository contains several modified versions of AFL components which we utilize in our experiments. 
+* **afl-fuzz-saveinputs** - dumps AFL-generated inputs and their sizes to file (for fixed input dataset experiments)
+* **testtrace** - evaluate any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset
+* **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
 
 
 ## INSTALLATION
