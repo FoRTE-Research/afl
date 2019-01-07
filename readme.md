@@ -21,7 +21,7 @@ This repository contains several modified versions of AFL components which we ut
   </tr>
   <tr>
     <td><b>Developer:</b></td>
-    <td>Stefan Nagy (<a href="mailto:snagy2@vt.edu">snagy2@vt.edu</a>)</td>
+    <td>Stefan Nagy (<a href="mailto:snagy2@vt.edu">snagy2@vt.edu</a>) </td>
   </tr>
   <tr>
     <td><b>License:</b></td>
@@ -71,3 +71,7 @@ We extend the `afl-cc` assembly-time instrumentation with a forkserver-only inst
 ./configure --disable-shared CC=afl-clang CXX=afl-clang++ CFLAGS="-g -O2 -no-pie -Wa,F" CXXFLAGS="-g -O2 -no-pie -Wa,-F"
 make all
 ```
+
+## 
+<p align=center> <a href="https:/www.cs.vt.edu"><img border="0" alt="W3Schools" src="http://people.cs.vt.edu/snagy2/img/vt_inline_computer_science.png" width="60%" height="60%">
+</a> </p>
