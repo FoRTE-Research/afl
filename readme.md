@@ -5,6 +5,7 @@
 |**LICENSE:** | [MIT License](LICENSE) |
 |**DISCLAIMER:**   | This software is strictly a research prototype. |
 
+
 # FoRTE-Research's AFL for Fixed Input Datasets
 
 This repository contains several modified versions of AFL components which we utilize in our experiments: 
