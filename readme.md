@@ -1,11 +1,3 @@
-|             |                |
-|-------------|----------------|
-|**AUTHOR:**  | Stefan Nagy  |
-|**EMAIL:**   | snagy2@vt.edu |
-|**LICENSE:** | [MIT License](LICENSE) |
-|**DISCLAIMER:**   | This software is strictly a research prototype. |
-
-
 # FoRTE-Research's AFL for Fixed Input Datasets
 
 This repository contains several modified versions of AFL components which we utilize in our experiments: 
@@ -13,20 +5,33 @@ This repository contains several modified versions of AFL components which we ut
 * **testtrace** - evaluate any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset
 * **afl-cc forkserver-only extension** - insert *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking)
 
-| | 
-| :-: |
-| **Presented in our paper** *[Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing](https://arxiv.org/abs/1812.11875)* <br> (to appear in IEEE S&P 2019). |
-
-#### Citing this repository:
-```
-@inproceedings {nagy:fullspeedfuzzing,
-  author = {Stefan Nagy and Matthew Hicks},
-  title = {{Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing},
-  booktitle = {40th {IEEE} Symposium on Security and Privacy (S&P},
-  month = {May}
-  year = {2019},
-}
-```
+<table>
+  <tr>
+    <td colspan="2"><p align=center><b>Presented in our paper</b> <a href="https://arxiv.org/abs/1812.11875"><i>Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing</i></a><br>(to appear in the 2019 IEEE Symposium on Security and Privacy).</p></td>
+  </tr>
+  <tr>
+    <td><b>Citing this repository:</b></td>
+    <td>
+      <code class="rich-diff-level-one">@inproceedings{nagy:fullspeedfuzzing,</code><br>
+      <code class="rich-diff-level-one">title = {Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing},</code><br>
+      <code class="rich-diff-level-one">author = {Stefan Nagy and Matthew Hicks},</code><br>
+      <code class="rich-diff-level-one">booktitle = {40th {IEEE} Symposium on Security and Privacy (S&P)},</code><br>
+      <code class="rich-diff-level-one">year = {2019},}</code>
+    </td>
+  </tr>
+  <tr>
+    <td><b>Developer:</b></td>
+    <td>Stefan Nagy (<a href="mailto:snagy2@vt.edu">snagy2@vt.edu</a>)</td>
+  </tr>
+  <tr>
+    <td><b>License:</b></td>
+    <td><a href="/FoRTE-Research/UnTracer-AFL/blob/master/LICENSE">MIT License</a></td>
+  </tr>
+  <tr>
+    <td><b>Disclaimer:</b></td>
+    <td><i>This software is strictly a research prototype.</i></td>
+  </tr>
+</table>
 
 ## INSTALLATION
 #### 1. Download and build AFL:
