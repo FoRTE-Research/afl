@@ -59,7 +59,7 @@ Input dump and sizes will be stored in `out_dir/_INPUT_DUMP` and `out_dir/_INPUT
  * **Note:** QEMU mode is recommended, otherwise dumps may be explosively large in size (depending on fuzzing speed).
 
 ## testtrace
-`testtrace` is an `afl-fuzz` modification for logging each fuzzed input's tracing time. Given an input dump and corresponding sizes file (produced by `afl-fuzz-saveinputs`), `testtrace` recreates each input and logs its execution (function `run_target()` in `afl-fuzz`) time. Usage is as follows:
+`testtrace` is an `afl-fuzz` modification for logging each fuzzed input's tracing time. Given an input dump and corresponding sizes file (produced by `afl-fuzz-saveinputs`), It recreates each input and logs its execution (function `run_target()` in `afl-fuzz`) time. Usage is as follows:
 ```
 testrace -i [/path/to/input/data/dump] -s [/path/to/input/sizes/dump] -o [/path/to/outdir] -f [/path/to/outfile] -c [max execs | skip for full dump] -t [exec timeout | skip for default (100ms)] -- [/path/to/target] [target_args]
 ```
