@@ -14,7 +14,7 @@ This repository contains several modified versions of AFL components which we ut
 |**LICENSE:** | [MIT License](LICENSE) |
 |**DISCLAIMER:**   | This software is strictly a research prototype. |
 
-## CITING THIS REPOSITORY
+### Citing this repository:
 ```
 @inproceedings {nagy:fullspeedfuzzing,
   author = {Stefan Nagy and Matthew Hicks},
