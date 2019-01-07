@@ -15,7 +15,7 @@ This repository contains several modified versions of AFL components which we ut
       <code class="rich-diff-level-one">@inproceedings{nagy:fullspeedfuzzing,</code><br>
       <code class="rich-diff-level-one">title = {Full-speed Fuzzing: Reducing Fuzzing Overhead through Coverage-guided Tracing},</code><br>
       <code class="rich-diff-level-one">author = {Stefan Nagy and Matthew Hicks},</code><br>
-      <code class="rich-diff-level-one">booktitle = {40th {IEEE} Symposium on Security and Privacy (S&P)},</code><br>
+      <code class="rich-diff-level-one">booktitle = {{IEEE} Symposium on Security and Privacy (Oakland)},</code><br>
       <code class="rich-diff-level-one">year = {2019},}</code>
     </td>
   </tr>
