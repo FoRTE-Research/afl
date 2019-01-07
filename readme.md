@@ -44,7 +44,6 @@ chmod +x ../afl-qemu-trace
 ```
 Note that the build may finish with an error even though `afl-qemu-trace` was built correctly. We recommend checking a few build status messages in the log to determine if the build was successful.
 
-
 ## afl-fuzz-saveinputs
 `afl-fuzz-saveinputs` is a modified version of `afl-fuzz` for dumping generated inputs to file. Usage is as follows:
 ```
