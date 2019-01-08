@@ -1,6 +1,6 @@
 # FoRTE-Research's AFL for Fixed Input Datasets
 
-This repository contains several modified versions of AFL components which we utilize in our experiments on fixed (pre-generated) fuzzing input datasets: 
+This repository contains several modified versions of [AFL](http://lcamtuf.coredump.cx/afl) components which we utilize in our experiments on fixed (pre-generated) fuzzing input datasets: 
 * **afl-fuzz-saveinputs** - dumps AFL-generated inputs and their sizes to file (for fixed input dataset experiments).
 * **testtrace** - evaluates any tracer's (e.g., QEMU, Dyninst) execution time on a fixed input dataset.
 * **afl-cc forkserver-only extension** - inserts *only* a forkserver during AFL's assembly-time instrumentation (useful for benchmarking).
