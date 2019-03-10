@@ -133,13 +133,11 @@ patch -p1 <../patches/cpu-exec.diff || exit 1
 patch -p1 <../patches/syscall.diff || exit 1
 
 # fixes glibc>=2.27 bug with memfd
-test "$GLIBC_VERSION" = "" && GLIBC_VERSION="`ldd --version | head -n 1 | grep -oE '[^ ]+$'`"
-
-if [ ""$GLIBC_VERSION>2.26" | bc" ]; then
-
+GLIBC_VERSION=`getconf GNU_LIBC_VERSION | grep -Eo '[+-]?[0-9]+([.][0-9]+)?'`
+function version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+if version_gt $GLIBC_VERSION 2.26; then
   patch -p1 <../patches/glibc_memfd.diff || exit 1
-  patch -p1 <../patches/glibc_configure.diff || exit 1
-
+  patch -p1 <../patches/glibc_configure.diff || exit 1    
 fi
 
 echo "[+] Patching done."
