@@ -7058,7 +7058,8 @@ static void usage(u8* argv0) {
        "Required parameters:\n\n"
 
        "  -i dir        - input directory with test cases\n"
-       "  -o dir        - output directory for fuzzer findings\n\n"
+       "  -o dir        - output directory for fuzzer findings\n"
+       "  -e exit_time  - exit time in minutes\n\n"
 
        "Execution control settings:\n\n"
 
@@ -7753,7 +7754,7 @@ int main(int argc, char** argv) {
         out_dir = optarg;
         break;
 
-      case 'e': /* output dir */
+      case 'e': /* exit time */
 
         if (exit_time) FATAL("Multiple -e options not supported");
         exit_time = atoi(optarg);
