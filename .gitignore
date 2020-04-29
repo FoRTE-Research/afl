@@ -53,29 +53,29 @@ ehthumbs.db
 Thumbs.db
 
 # AFL-specific binaries
-afl-g++
+afl-as
 afl-clang
 afl-clang++
+afl-gcc
+afl-g++
+untracer-as
+untracer-clang
+untracer-clang++
+untracer-gcc
+untracer-g++
 as
 afl-analyze
-afl-as
-afl-gcc
-afl-fuzz
-afl-fuzz-saveinputs
-afl-gotcpu
-afl-qemu-trace
 afl-showmap
-afl-tmin
-FSF-AFL-inputgen
-FSF-AFL-tracer
-testtrace
-qemu_mode/qemu-2.10.0/
-cluster_eval/
+libUnTracerDyninst.so
+untracer-afl
+UnTracerDyninst
+afl-saveinputs
+afl-testtrace
+afl-qemu-trace*
 
 # Misc folders
 .idea/
 cmake-build-debug/CMakeFiles/
-
 
 # Kernel Module Compile Results
 *.mod*

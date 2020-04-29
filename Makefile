@@ -24,8 +24,7 @@ MISC_PATH   = $(PREFIX)/share/afl
 
 # PROGS intentionally omit afl-as, which gets installed elsewhere.
 
-PROGS       = testtrace afl-fuzz-saveinputs afl-gcc afl-fuzz afl-showmap afl-tmin afl-gotcpu afl-analyze
-SH_PROGS    = afl-plot afl-cmin afl-whatsup
+PROGS       = afl-gcc afl-showmap afl-saveinputs afl-testtrace 
 
 CFLAGS     ?= -O3 -funroll-loops
 CFLAGS     += -Wall -D_FORTIFY_SOURCE=2 -g -Wno-pointer-sign \
@@ -61,10 +60,10 @@ test_x86:
 
 endif
 
-testtrace: testtrace.c $(COMM_HDR) | test_x86
+afl-testtrace: afl-testtrace.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
-afl-fuzz-saveinputs: afl-fuzz-saveinputs.c $(COMM_HDR) | test_x86
+afl-saveinputs: afl-saveinputs.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 afl-gcc: afl-gcc.c $(COMM_HDR) | test_x86
@@ -75,19 +74,7 @@ afl-as: afl-as.c afl-as.h $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 	ln -sf afl-as as
 
-afl-fuzz: afl-fuzz.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
 afl-showmap: afl-showmap.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
-afl-tmin: afl-tmin.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
-afl-analyze: afl-analyze.c $(COMM_HDR) | test_x86
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
-
-afl-gotcpu: afl-gotcpu.c $(COMM_HDR) | test_x86
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 ifndef AFL_NO_X86
