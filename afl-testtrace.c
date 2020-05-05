@@ -4801,8 +4801,6 @@ int main(int argc, char** argv) {
   u8  *extras_dir = 0;
   u8  mem_limit_given = 0;
   char** use_argv;
-
-  int maxExecsGiven = 0;
   
   struct timeval tv;
   struct timezone tz;
@@ -4844,20 +4842,16 @@ int main(int argc, char** argv) {
 
         if (stats_out) FATAL("Multiple -f options not supported");
         stats_out = optarg;
-
         break;
 
       case 'o': /* output dir */
-
         if (out_dir) FATAL("Multiple -o options not supported");
         out_dir = optarg;
         break;
 
       case 'c': 
-        if (!maxExecs){
-            maxExecs = atoi(optarg);
-            maxExecsGiven = 1;
-        }
+        if (maxExecs) FATAL("Multiple -c options not supported");
+        maxExecs = atoi(optarg);
         break;
 
       case 'M': { /* master sync ID */
@@ -4994,10 +4988,24 @@ int main(int argc, char** argv) {
       default:
 
         usage(argv[0]);
-
     }
 
-  if (optind == argc || !out_dir || !inp_dump || !inp_sizes || !stats_out) usage(argv[0]);
+  if (optind == argc || !out_dir) usage(argv[0]); 
+
+  if (!inp_dump){
+    FATAL("Input dump file path missing!");
+    usage(argv[0]);
+  }
+
+  if (!inp_sizes) {
+    FATAL("Input sizes file path missing!");
+    usage(argv[0]);
+  }
+
+  if (!stats_out){
+    FATAL("Output stats file path missing!");
+    usage(argv[0]);
+  }
 
   setup_signal_handlers();
   check_asan_opts();
@@ -5005,13 +5013,12 @@ int main(int argc, char** argv) {
   if (sync_id) fix_up_sync();
 
   /* Check validity of dump and sizes file */
+
   if (access(inp_dump, F_OK) == -1) {
-    perror("Input dump file invalid!");
-    exit(EXIT_FAILURE);
+    FATAL("Input dump file invalid!");
   }
   if (access(inp_sizes, F_OK) == -1) {
-    perror("Inout sizes file invalid!");
-    exit(EXIT_FAILURE);
+    FATAL("Input sizes file invalid!");
   }
 
   if (!strcmp(inp_dump, inp_sizes))
@@ -5131,7 +5138,7 @@ int main(int argc, char** argv) {
     if (stop_soon)
       break;
 
-    if (maxExecsGiven)
+    if (maxExecs)
       if (totalExecs >= maxExecs)
           break;
   }

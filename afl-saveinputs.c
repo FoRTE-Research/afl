@@ -2458,8 +2458,10 @@ static u8 run_target(char** argv, u32 timeout) {
 static void write_to_testcase(void* mem, u32 len) {
 
   /* First, check to see if time budget has been exceeded. */
-  if (get_cur_time() - start_time > exit_time*60*1000){
-    exit(0);
+  if (exit_time){
+    if (get_cur_time() - start_time > exit_time*60*1000){
+      exit(0);
+    }
   }
   
   /* Append input memory to dump file and verify correctness. */
@@ -7055,11 +7057,11 @@ static void usage(u8* argv0) {
 
   SAYF("\n%s [ options ] -- /path/to/fuzzed_app [ ... ]\n\n"
 
-       "Required parameters:\n\n"
+       "Parameters:\n\n"
 
        "  -i dir        - input directory with test cases\n"
        "  -o dir        - output directory for fuzzer findings\n"
-       "  -e exit_time  - exit time in minutes\n\n"
+       "  -e exit_time  - exit time in minutes (optional)\n\n"
 
        "Execution control settings:\n\n"
 
